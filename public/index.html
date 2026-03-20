@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboard — LP Onboarding</title>
+<style>
+  :root {
+    --navy: #1A2E44;
+    --teal: #0D9488;
+    --teal-light: #CCFBF1;
+    --slate: #475569;
+    --lgrey: #E2E8F0;
+    --offwhite: #F8FAFC;
+    --white: #FFFFFF;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --green: #16A34A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: var(--offwhite); color: var(--slate); min-height: 100vh; }
+
+  /* ── Header ── */
+  header { background: var(--navy); padding: 0 2rem; height: 60px;
+           display: flex; align-items: center; justify-content: space-between; }
+  header .logo { font-family: Georgia, serif; font-size: 1.4rem; font-weight: 700;
+                 color: #fff; letter-spacing: 0.1em; }
+  header .logo span { color: var(--teal); }
+  header .tagline { font-size: 0.75rem; color: #8EADC7; letter-spacing: 0.05em; }
+
+  /* ── Layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-steps { display: flex; gap: 0; margin-bottom: 0.5rem; }
+  .step-item { flex: 1; text-align: center; position: relative; }
+  .step-item::after { content: ''; position: absolute; top: 14px; left: 50%; right: -50%;
+                      height: 2px; background: var(--lgrey); z-index: 0; }
+  .step-item:last-child::after { display: none; }
+  .step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--lgrey);
+                 background: #fff; display: flex; align-items: center; justify-content: center;
+                 font-size: 0.7rem; font-weight: 700; margin: 0 auto 0.3rem;
+                 position: relative; z-index: 1; color: #94A3B8; transition: all .3s; }
+  .step-circle.active { border-color: var(--teal); background: var(--teal); color: #fff; }
+  .step-circle.done   { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+  .step-label { font-size: 0.65rem; color: #94A3B8; font-weight: 600;
+                text-transform: uppercase; letter-spacing: 0.05em; }
+  .step-label.active { color: var(--teal); }
+
+  /* ── Card ── */
+  .card { background: #fff; border-radius: 12px; border: 1px solid var(--lgrey);
+          box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 2rem 2.5rem; }
+  .card-title { font-size: 1.3rem; font-weight: 700; color: var(--navy); margin-bottom: 0.3rem; }
+  .card-subtitle { font-size: 0.875rem; color: #64748B; margin-bottom: 1.8rem; }
+
+  /* ── Form fields ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+  label { font-size: 0.8rem; font-weight: 600; color: var(--navy); text-transform: uppercase;
+          letter-spacing: 0.04em; }
+  label .req { color: var(--teal); }
+  input, select, textarea {
+    border: 1.5px solid var(--lgrey); border-radius: 8px; padding: 0.65rem 0.9rem;
+    font-size: 0.9rem; color: var(--slate); background: #fff; outline: none;
+    transition: border-color .2s, box-shadow .2s; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .hint { font-size: 0.75rem; color: #94A3B8; margin-top: 0.2rem; }
+
+  /* ── Checkbox group ── */
+  .checkbox-group { display: flex; flex-direction: column; gap: 0.7rem; margin: 0.5rem 0; }
+  .checkbox-item { display: flex; align-items: flex-start; gap: 0.7rem; cursor: pointer; }
+  .checkbox-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--teal);
+                                         flex-shrink: 0; margin-top: 1px; }
+  .checkbox-text { font-size: 0.875rem; color: var(--slate); line-height: 1.4; }
+  .checkbox-text strong { color: var(--navy); }
+
+  /* ── Radio group ── */
+  .radio-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.3rem; }
+  .radio-item { display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
+                padding: 0.6rem 0.8rem; border: 1.5px solid var(--lgrey); border-radius: 8px;
+                transition: all .2s; }
+  .radio-item:hover { border-color: var(--teal); background: var(--teal-light); }
+  .radio-item input[type=radio] { accent-color: var(--teal); flex-shrink: 0; }
+  .radio-item .radio-label { font-size: 0.875rem; color: var(--slate); font-weight: 500; }
+  .radio-item.selected { border-color: var(--teal); background: var(--teal-light); }
+
+  /* ── Info box ── */
+  .info-box { background: #F0FDFA; border: 1px solid var(--teal); border-radius: 8px;
+              padding: 0.8rem 1rem; margin-bottom: 1.5rem; font-size: 0.83rem; color: #0F766E; }
+  .info-box strong { display: block; margin-bottom: 0.2rem; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--lgrey); margin: 1.5rem 0; }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; justify-content: space-between; align-items: center;
+             margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--lgrey); }
+  .btn { padding: 0.75rem 1.8rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+         border: none; cursor: pointer; transition: all .2s; letter-spacing: 0.02em; }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-primary:hover { background: #0F766E; box-shadow: 0 4px 14px rgba(13,148,136,0.3); }
+  .btn-secondary { background: transparent; color: var(--slate); border: 1.5px solid var(--lgrey); }
+  .btn-secondary:hover { background: var(--offwhite); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Fund badge ── */
+  .fund-badge { display: inline-flex; align-items: center; gap: 0.5rem;
+                background: var(--navy); color: #fff; padding: 0.4rem 1rem;
+                border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+                margin-bottom: 1.5rem; }
+  .fund-badge span { color: var(--teal); }
+
+  /* ── Steps (hidden/visible) ── */
+  .form-step { display: none; }
+  .form-step.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Review step ── */
+  .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1rem; }
+  .review-item { background: var(--offwhite); border-radius: 8px; padding: 0.65rem 0.9rem; }
+  .review-item .r-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+                           color: #94A3B8; font-weight: 600; margin-bottom: 0.15rem; }
+  .review-item .r-value { font-size: 0.9rem; color: var(--navy); font-weight: 500; }
+
+  /* ── Success screen ── */
+  #success-screen { display: none; text-align: center; padding: 3rem 2rem; }
+  .success-icon { width: 72px; height: 72px; background: var(--teal-light); border-radius: 50%;
+                  display: flex; align-items: center; justify-content: center;
+                  margin: 0 auto 1.5rem; font-size: 2rem; }
+  .success-title { font-size: 1.5rem; font-weight: 700; color: var(--navy); margin-bottom: 0.5rem; }
+  .success-sub { font-size: 0.95rem; color: var(--slate); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .lp-id-box { background: var(--offwhite); border: 1.5px solid var(--lgrey); border-radius: 8px;
+               padding: 0.8rem 1.5rem; display: inline-block; margin-bottom: 1.5rem; }
+  .lp-id-box .lp-id-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: #94A3B8; }
+  .lp-id-box .lp-id-value { font-size: 1.1rem; font-weight: 700; color: var(--navy); font-family: monospace; }
+  .ai-badge { background: linear-gradient(135deg, var(--navy), #0D5A7C);
+              color: #fff; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem;
+              font-size: 0.83rem; text-align: left; }
+  .ai-badge .ai-title { font-weight: 700; color: var(--teal); margin-bottom: 0.3rem; font-size: 0.9rem; }
+  .score-bar-wrap { margin: 0.5rem 0; }
+  .score-bar-bg { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .score-bar-fill { height: 6px; background: var(--teal); border-radius: 3px; transition: width 1s ease; }
+  .status-chip { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px;
+                 font-size: 0.75rem; font-weight: 600; }
+  .status-review { background: #FEF3C7; color: #92400E; }
+  .status-approved { background: #DCFCE7; color: #14532D; }
+  .status-flagged  { background: #FEE2E2; color: #991B1B; }
+
+  .btn-status { background: var(--teal); color: #fff; padding: 0.75rem 2rem;
+                border-radius: 8px; border: none; cursor: pointer; font-size: 0.9rem;
+                font-weight: 600; text-decoration: none; display: inline-block; margin-top: 0.5rem; }
+
+  /* ── Loading overlay ── */
+  .loading { display: none; position: fixed; inset: 0; background: rgba(26,46,68,0.7);
+             backdrop-filter: blur(4px); z-index: 100;
+             align-items: center; justify-content: center; flex-direction: column; }
+  .loading.visible { display: flex; }
+  .spinner { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2);
+             border-top-color: var(--teal); border-radius: 50%;
+             animation: spin 0.8s linear infinite; margin-bottom: 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: #fff; font-size: 0.95rem; text-align: center; }
+  .loading-sub { color: #8EADC7; font-size: 0.8rem; margin-top: 0.3rem; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .review-grid { grid-template-columns: 1fr; }
+    .card { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ONBOARD<span>.</span></div>
+  <div class="tagline">LP Onboarding · Powered by Claude AI</div>
+</header>
+
+<div class="page">
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-steps">
+      <div class="step-item"><div class="step-circle active" id="sc1">1</div><div class="step-label active" id="sl1">Identity</div></div>
+      <div class="step-item"><div class="step-circle" id="sc2">2</div><div class="step-label" id="sl2">Investment</div></div>
+      <div class="step-item"><div class="step-circle" id="sc3">3</div><div class="step-label" id="sl3">Compliance</div></div>
+      <div class="step-item"><div class="step-circle" id="sc4">4</div><div class="step-label" id="sl4">Documents</div></div>
+      <div class="step-item"><div class="step-circle" id="sc5">5</div><div class="step-label" id="sl5">Review</div></div>
+    </div>
+  </div>
+
+  <!-- Form card -->
+  <div class="card" id="form-card">
+    <div class="fund-badge">🏦 <span>Felten Capital Fund I</span> &nbsp;·&nbsp; Private Equity &nbsp;·&nbsp; CHF 350M</div>
+
+    <!-- ── Step 1: Identity ── -->
+    <div class="form-step active" id="step1">
+      <div class="card-title">Investor Identity</div>
+      <div class="card-subtitle">Please provide your personal and contact information as it appears on your official identification documents.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Legal Name <span class="req">*</span></label>
+          <input type="text" id="lpName" placeholder="e.g. Johann Schmidt" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nationality <span class="req">*</span></label>
+          <select id="nationality">
+            <option value="">Select country…</option>
+            <option>Switzerland</option><option>Germany</option><option>Austria</option>
+            <option>Luxembourg</option><option>France</option><option>United Kingdom</option>
+            <option>Netherlands</option><option>United States</option><option>Singapore</option>
+            <option>United Arab Emirates</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Investor Type <span class="req">*</span></label>
+          <select id="investorType">
+            <option value="">Select type…</option>
+            <option>Individual HNWI</option>
+            <option>Family Office</option>
+            <option>Institutional</option>
+            <option>Corporate</option>
+            <option>Fund of Funds</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <div></div>
+        <button class="btn btn-primary" onclick="goTo(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Investment ── -->
+    <div class="form-step" id="step2">
+      <div class="card-title">Investment Details</div>
+      <div class="card-subtitle">Please confirm your investment commitment and the source of the funds being invested.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Committed Amount <span class="req">*</span></label>
+          <input type="number" id="committedAmount" placeholder="500" min="500">
+          <span class="hint">Minimum €500k · Amount in thousands EUR</span>
+        </div>
+        <div class="form-group">
+          <label>Currency</label>
+          <select>
+            <option>EUR</option><option>CHF</option><option>USD</option><option>GBP</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Primary Source of Wealth <span class="req">*</span></label>
+          <select id="sourceOfWealth">
+            <option value="">Select source…</option>
+            <option>Business / Entrepreneurship</option>
+            <option>Employment Income</option>
+            <option>Investment Returns</option>
+            <option>Inheritance / Gift</option>
+            <option>Real Estate Proceeds</option>
+            <option>Sale of Company / Equity</option>
+            <option>Other (please specify in notes)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea id="notes" placeholder="Any additional context about your investment or background (optional)…"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Compliance ── -->
+    <div class="form-step" id="step3">
+      <div class="card-title">Compliance Declarations</div>
+      <div class="card-subtitle">These declarations are required under AIFMD and GDPR for all LP investors in European alternative funds.</div>
+
+      <div class="info-box">
+        <strong>⚖️ Why we ask this</strong>
+        Felten Capital Fund I is regulated under AIFMD and subject to AML/KYC requirements. These disclosures allow our compliance team to complete your onboarding efficiently.
+      </div>
+
+      <div class="form-group" style="margin-bottom:1.2rem">
+        <label>Politically Exposed Person (PEP) Status <span class="req">*</span></label>
+        <div class="hint" style="margin-bottom:0.5rem">A PEP is a person who holds (or has held within the last 12 months) a prominent public function, or is a family member or close associate of such a person.</div>
+        <div class="radio-group" id="pepGroup">
+          <label class="radio-item" onclick="selectRadio(this,'pepStatus','No')">
+            <input type="radio" name="pepStatus" value="No"> <span class="radio-label">I am <strong>not</strong> a Politically Exposed Person</span>
+          </label>
+          <label class="radio-item" onclick="selectRadio(this,'pepStatus','Yes')">
+            <input type="radio" name="pepStatus" value="Yes"> <span class="radio-label">I am (or have been within 12 months) a Politically Exposed Person</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label>Sanctions Confirmation <span class="req">*</span></label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="sanctionsConfirm">
+            <span class="checkbox-text">I confirm that I am not subject to any EU, US, UN, or Swiss sanctions, and I am not acting on behalf of any sanctioned individual or entity.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label>GDPR Consent <span class="req">*</span></label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="gdprConsent">
+            <span class="checkbox-text">I consent to the processing of my personal data by Felten Capital and Onboard for the purposes of investor onboarding, KYC/AML compliance, and fund administration, in accordance with GDPR.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(2)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 4: Documents ── -->
+    <div class="form-step" id="step4">
+      <div class="card-title">Document Checklist</div>
+      <div class="card-subtitle">Please confirm which documents you are prepared to provide. Physical documents will be collected by our legal team within 24 hours.</div>
+
+      <div class="info-box">
+        <strong>📄 Required Documents</strong>
+        Please confirm availability. Our team will follow up by secure email with upload instructions.
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom:1.5rem">
+        <label class="checkbox-item">
+          <input type="checkbox" id="kycDocs">
+          <span class="checkbox-text"><strong>KYC Identity Documents</strong> — Valid passport or national ID card (both sides)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="subDocSigned">
+          <span class="checkbox-text"><strong>Subscription Agreement</strong> — I have reviewed and am prepared to sign the fund subscription documents</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="sowDocs">
+          <span class="checkbox-text"><strong>Source of Wealth Evidence</strong> — Bank statements, company accounts, or other documentary evidence</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="taxDocs">
+          <span class="checkbox-text"><strong>Tax Residency Certificate</strong> — FATCA/CRS self-certification (provided by our team)</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Documents (Optional)</label>
+        <div style="border: 2px dashed var(--lgrey); border-radius: 8px; padding: 1.5rem;
+                    text-align: center; color: #94A3B8; font-size: 0.875rem;">
+          📎 Drag & drop files here, or <span style="color:var(--teal);cursor:pointer">browse</span><br>
+          <span style="font-size:0.75rem">PDF, JPG, PNG · Max 10MB per file</span>
+        </div>
+        <span class="hint">For the pilot, document upload is optional. Our team will reach out separately.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(3)">← Back</button>
+        <button class="btn btn-primary" onclick="buildReview(); goTo(5)">Review Submission →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 5: Review ── -->
+    <div class="form-step" id="step5">
+      <div class="card-title">Review Your Submission</div>
+      <div class="card-subtitle">Please confirm all details before submitting. Claude AI will review your application and route it to our team within seconds.</div>
+
+      <div class="review-grid" id="reviewGrid">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="info-box" style="background:#EFF6FF;border-color:#3B82F6;color:#1E40AF">
+        <strong>🤖 AI-Powered Review</strong>
+        When you click "Submit", Claude AI will automatically review your submission for completeness, assess KYC/AML compliance, and route tasks to our Legal, Compliance, and Finance teams — all within 30 seconds.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(4)">← Back</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">Submit to Onboard →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success screen -->
+  <div id="success-screen">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Submission Received</h2>
+    <p class="success-sub">Your onboarding application has been submitted. Claude AI has reviewed your information and routed tasks to our team.</p>
+
+    <div class="lp-id-box">
+      <div class="lp-id-label">Your Reference ID</div>
+      <div class="lp-id-value" id="refId">LP-1234567890</div>
+    </div>
+
+    <div class="ai-badge" id="aiBadge">
+      <div class="ai-title">🤖 Claude AI Review Complete</div>
+      <div id="aiSummary" style="margin-bottom:0.5rem;line-height:1.5">Reviewing your submission…</div>
+      <div style="display:flex;align-items:center;gap:1rem;margin-top:0.5rem">
+        <div style="flex:1">
+          <div style="font-size:0.7rem;color:#8EADC7;margin-bottom:0.3rem">COMPLETENESS SCORE</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBar" style="width:0%"></div></div>
+          </div>
+          <div id="scoreText" style="font-size:0.75rem;color:#8EADC7;margin-top:0.2rem">—</div>
+        </div>
+        <div>
+          <div id="statusChip" class="status-chip status-review">Under Review</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:0.85rem;color:#64748B;margin-bottom:1.5rem">
+      ✅ Tasks routed to Legal · Compliance · Finance<br>
+      ✅ Record created in Onboard Notion workspace<br>
+      ✅ You will receive an email within 48 hours
+    </div>
+
+    <a id="statusLink" href="/status" class="btn-status">Track Your Onboarding Status →</a>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Claude AI is reviewing your submission…</div>
+  <div class="loading-sub">Checking completeness · Routing tasks · Updating Notion</div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+let selectedPep = "No";
+let submissionResult = null;
+
+function goTo(step) {
+  if (step < 1 || step > totalSteps) return;
+  if (!validateStep(currentStep)) return;
+
+  document.getElementById('step' + currentStep).classList.remove('active');
+  document.getElementById('sc' + currentStep).classList.remove('active');
+  document.getElementById('sl' + currentStep).classList.remove('active');
+  if (step > currentStep) document.getElementById('sc' + currentStep).classList.add('done');
+
+  currentStep = step;
+  document.getElementById('step' + currentStep).classList.add('active');
+  document.getElementById('sc' + currentStep).classList.add('active');
+  document.getElementById('sl' + currentStep).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep(step) {
+  if (step === 1) {
+    if (!document.getElementById('lpName').value.trim()) { alert('Please enter your full legal name.'); return false; }
+    if (!document.getElementById('email').value.trim()) { alert('Please enter your email address.'); return false; }
+    if (!document.getElementById('nationality').value) { alert('Please select your nationality.'); return false; }
+    if (!document.getElementById('investorType').value) { alert('Please select your investor type.'); return false; }
+  }
+  if (step === 2) {
+    if (!document.getElementById('committedAmount').value) { alert('Please enter your committed amount.'); return false; }
+    if (!document.getElementById('sourceOfWealth').value) { alert('Please select your source of wealth.'); return false; }
+  }
+  if (step === 3) {
+    if (!document.querySelector('input[name="pepStatus"]:checked')) { alert('Please complete the PEP declaration.'); return false; }
+    if (!document.getElementById('sanctionsConfirm').checked) { alert('Please confirm the sanctions declaration.'); return false; }
+    if (!document.getElementById('gdprConsent').checked) { alert('Please confirm your GDPR consent.'); return false; }
+  }
+  return true;
+}
+
+function selectRadio(el, name, value) {
+  document.querySelectorAll(`#pepGroup .radio-item`).forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPep = value;
+}
+
+function buildReview() {
+  const items = [
+    ['Full Name',      document.getElementById('lpName').value],
+    ['Email',          document.getElementById('email').value],
+    ['Nationality',    document.getElementById('nationality').value],
+    ['Investor Type',  document.getElementById('investorType').value],
+    ['Commitment',     '€' + document.getElementById('committedAmount').value + 'k'],
+    ['Source of Wealth', document.getElementById('sourceOfWealth').value],
+    ['PEP Status',     selectedPep === 'No' ? 'Not a PEP' : 'PEP — will require enhanced due diligence'],
+    ['KYC Docs',       document.getElementById('kycDocs').checked ? '✓ Confirmed' : '⚠ Not confirmed'],
+    ['Sub Doc',        document.getElementById('subDocSigned').checked ? '✓ Ready to sign' : '⚠ Not confirmed'],
+    ['Fund',           'Felten Capital Fund I'],
+  ];
+  const grid = document.getElementById('reviewGrid');
+  grid.innerHTML = items.map(([l, v]) => `
+    <div class="review-item">
+      <div class="r-label">${l}</div>
+      <div class="r-value">${v || '—'}</div>
+    </div>`).join('');
+}
+
+async function submitForm() {
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('submitBtn').disabled = true;
+
+  const body = new URLSearchParams({
+    lpName:           document.getElementById('lpName').value,
+    email:            document.getElementById('email').value,
+    nationality:      document.getElementById('nationality').value,
+    investorType:     document.getElementById('investorType').value,
+    committedAmount:  document.getElementById('committedAmount').value,
+    sourceOfWealth:   document.getElementById('sourceOfWealth').value,
+    pepStatus:        selectedPep,
+    notes:            document.getElementById('notes').value,
+    kycDocs:          document.getElementById('kycDocs').checked,
+    subDocSigned:     document.getElementById('subDocSigned').checked,
+    fund:             'Felten Capital Fund I',
+  });
+
+  try {
+    const res = await fetch('/submit', { method: 'POST', body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+    const data = await res.json();
+    submissionResult = data;
+    showSuccess(data);
+  } catch (e) {
+    alert('Submission error: ' + e.message);
+    document.getElementById('submitBtn').disabled = false;
+  } finally {
+    document.getElementById('loading').classList.remove('visible');
+  }
+}
+
+function showSuccess(data) {
+  document.getElementById('form-card').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('refId').textContent = data.lpId;
+  document.getElementById('aiSummary').textContent = data.summary || 'Review complete.';
+  document.getElementById('statusLink').href = '/status?id=' + data.lpId;
+
+  const score = data.score || 0;
+  setTimeout(() => {
+    document.getElementById('scoreBar').style.width = score + '%';
+  }, 300);
+  document.getElementById('scoreText').textContent = score + ' / 100';
+
+  const chip = document.getElementById('statusChip');
+  chip.textContent = data.status || 'Under Review';
+  chip.className = 'status-chip ' + (
+    data.recommendation === 'Approve' ? 'status-approved' :
+    data.recommendation === 'Reject'  ? 'status-flagged'  : 'status-review'
+  );
+
+  // hide progress
+  document.querySelector('.progress-wrap').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

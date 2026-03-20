@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard — GP Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #1A2E44;
+      --teal:   #0D9488;
+      --teal-l: #14B8A8;
+      --off-w:  #F8FAFC;
+      --slate:  #64748B;
+      --light:  #E2E8F0;
+      --danger: #EF4444;
+      --warn:   #F59E0B;
+      --ok:     #10B981;
+      --purple: #8B5CF6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--off-w);
+      color: #1E293B;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .layout { display: flex; min-height: 100vh; }
+
+    aside {
+      width: 220px;
+      background: var(--navy);
+      padding: 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-logo {
+      padding: 1.4rem 1.5rem 1rem;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .logo-mark {
+      width: 34px; height: 34px; background: var(--teal);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; color: #fff; font-size: 15px;
+    }
+    .sidebar-logo span { color: #fff; font-weight: 700; font-size: 1rem; }
+
+    .sidebar-section {
+      padding: 1rem 1rem 0.5rem;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: #5E8FAD;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 1.5rem; font-size: 0.87rem; color: #94A3B8;
+      cursor: pointer; border-radius: 0; transition: all .2s;
+      text-decoration: none;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .nav-item.active { color: #fff; background: rgba(13,148,136,.2);
+      border-right: 3px solid var(--teal); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-spacer { flex: 1; }
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+      font-size: 0.78rem; color: #5E8FAD;
+    }
+    .sidebar-fund { color: #94A3B8; font-weight: 600; }
+
+    /* ── Main ── */
+    main { flex: 1; overflow-y: auto; }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--light);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topbar h1 { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .refresh-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; background: var(--teal); color: #fff;
+      border: none; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .refresh-btn:hover { background: var(--teal-l); }
+    .last-updated { font-size: 0.78rem; color: var(--slate); }
+
+    .content { padding: 1.8rem 2rem; }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .stat-label { font-size: 0.73rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--slate); margin-bottom: 0.5rem; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--navy); line-height: 1; }
+    .stat-sub { font-size: 0.78rem; color: var(--slate); margin-top: 4px; }
+
+    .stat-card.highlight { background: var(--navy); }
+    .stat-card.highlight .stat-label { color: #6B9FBD; }
+    .stat-card.highlight .stat-value { color: var(--teal-l); }
+    .stat-card.highlight .stat-sub   { color: #5E8FAD; }
+
+    /* ── Two-col layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+
+    /* ── LP table ── */
+    .section-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--light);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-head h2 { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+    .section-head .count-badge {
+      background: var(--off-w); color: var(--slate);
+      padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 1.5rem;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--slate);
+      background: var(--off-w); text-align: left;
+    }
+    tbody tr { border-bottom: 1px solid var(--light); transition: background .15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--off-w); }
+    tbody td { padding: 11px 1.5rem; font-size: 0.87rem; color: #334155; }
+
+    .lp-name-cell { font-weight: 600; color: var(--navy); }
+    .lp-email-cell { color: var(--slate); font-size: 0.8rem; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    .pill-submitted   { background: #F1F5F9; color: #64748B; }
+    .pill-submitted .pill-dot   { background: #94A3B8; }
+    .pill-review      { background: #FFFBEB; color: #92400E; }
+    .pill-review .pill-dot      { background: var(--warn); }
+    .pill-legal       { background: #EDE9FE; color: #5B21B6; }
+    .pill-legal .pill-dot       { background: var(--purple); }
+    .pill-compliance  { background: #EFF6FF; color: #1E40AF; }
+    .pill-compliance .pill-dot  { background: #3B82F6; }
+    .pill-approved    { background: #ECFDF5; color: #065F46; }
+    .pill-approved .pill-dot    { background: var(--ok); }
+    .pill-rejected    { background: #FEF2F2; color: #991B1B; }
+    .pill-rejected .pill-dot    { background: var(--danger); }
+
+    .score-mini {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .score-mini-bar {
+      width: 60px; height: 6px; background: var(--light);
+      border-radius: 4px; overflow: hidden;
+    }
+    .score-mini-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--teal), var(--teal-l));
+    }
+    .score-mini-val { font-size: 0.82rem; color: var(--slate); font-weight: 600; width: 28px; }
+
+    .notion-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--slate); font-size: 0.8rem; text-decoration: none;
+      padding: 3px 8px; border-radius: 6px; transition: all .15s;
+    }
+    .notion-link:hover { background: var(--light); color: var(--navy); }
+
+    /* ── Right column ── */
+    .right-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* Status breakdown */
+    .breakdown-list { padding: 0.5rem 0; }
+    .breakdown-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.7rem 1.5rem;
+      border-bottom: 1px solid var(--light);
+    }
+    .breakdown-item:last-child { border-bottom: none; }
+    .breakdown-label { display: flex; align-items: center; gap: 8px; font-size: 0.87rem; }
+    .bd-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .breakdown-count { font-weight: 700; color: var(--navy); font-size: 0.9rem; }
+    .breakdown-bar-wrap { flex: 1; margin: 0 14px; }
+    .breakdown-bar { height: 5px; background: var(--light); border-radius: 4px; overflow: hidden; }
+    .breakdown-bar-fill { height: 100%; border-radius: 4px; }
+
+    /* Recent activity */
+    .activity-list { padding: 0; }
+    .activity-item {
+      padding: 0.9rem 1.5rem;
+      border-bottom: 1px solid var(--light);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .act-name { font-weight: 600; font-size: 0.88rem; color: var(--navy); }
+    .act-meta { font-size: 0.78rem; color: var(--slate); }
+    .act-rec { font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
+    .rec-approve  { color: var(--ok); }
+    .rec-review   { color: var(--warn); }
+    .rec-reject   { color: var(--danger); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--slate);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .empty-state h3 { margin-bottom: 0.3rem; color: var(--navy); font-size: 1rem; }
+    .empty-state p { font-size: 0.85rem; }
+
+    /* ── Loading ── */
+    .loading-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,.7);
+      align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    .loading-overlay.visible { display: flex; }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--light);
+      border-top-color: var(--teal); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .two-col { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 680px) {
+      aside { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-logo">
+      <div class="logo-mark">OB</div>
+      <span>Onboard</span>
+    </div>
+    <div class="sidebar-section">GP Workspace</div>
+    <a class="nav-item active" href="/gp">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a class="nav-item" href="/" target="_blank">
+      <span class="nav-icon">📝</span> LP Form
+    </a>
+    <a class="nav-item" href="/status" target="_blank">
+      <span class="nav-icon">🔍</span> Status Lookup
+    </a>
+    <div class="sidebar-section" style="margin-top:1rem;">Notion Databases</div>
+    <a class="nav-item" href="https://www.notion.so/3f253f1689b74b58a5344ccd76600b49" target="_blank">
+      <span class="nav-icon">👤</span> LP Pipeline
+    </a>
+    <a class="nav-item" href="https://www.notion.so/928b845946e649758dcb57ce4c1e16bc" target="_blank">
+      <span class="nav-icon">✅</span> Compliance Tasks
+    </a>
+    <a class="nav-item" href="https://www.notion.so/72f762bcff594eca8d95a44d1218b5aa" target="_blank">
+      <span class="nav-icon">💼</span> Funds
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <div class="sidebar-fund">Felten Capital Fund I</div>
+      <div style="margin-top:3px;">PE · Switzerland · AIFMD</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <div class="topbar">
+      <h1>GP Operations Dashboard</h1>
+      <div class="topbar-right">
+        <span class="last-updated" id="last-updated">Refreshing…</span>
+        <button class="refresh-btn" onclick="loadDashboard()">
+          ↻ Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Stat cards -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-label">Total LPs</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub">Submitted to date</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Score</div>
+          <div class="stat-value" id="stat-avg">—</div>
+          <div class="stat-sub">Onboarding readiness</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Under Review</div>
+          <div class="stat-value" id="stat-review">—</div>
+          <div class="stat-sub">Pending assessment</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Approved</div>
+          <div class="stat-value" id="stat-approved">—</div>
+          <div class="stat-sub" id="stat-approved-pct">—</div>
+        </div>
+      </div>
+
+      <!-- Two-col -->
+      <div class="two-col">
+
+        <!-- LP table -->
+        <div class="section-card">
+          <div class="section-head">
+            <h2>LP Pipeline</h2>
+            <span class="count-badge" id="lp-count">0 LPs</span>
+          </div>
+          <div id="lp-table-wrap">
+            <div class="empty-state">
+              <div class="empty-icon">⏳</div>
+              <h3>Loading…</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right col -->
+        <div class="right-col">
+
+          <!-- Status breakdown -->
+          <div class="section-card">
+            <div class="section-head">
+              <h2>Status Breakdown</h2>
+            </div>
+            <div class="breakdown-list" id="breakdown-list">
+              <div class="empty-state" style="padding:1.5rem">
+                <div style="font-size:0.85rem;color:var(--slate)">No data yet</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent activity -->
+          <div class="section-card">
+            <div class="section-head">
+              <h2>Recent Activity</h2>
+            </div>
+            <div class="activity-list" id="activity-list">
+              <div class="empty-state" style="padding:1.5rem">
+                <div style="font-size:0.85rem;color:var(--slate)">No recent activity</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const STATUS_COLORS = {
+    "Form Submitted":   { pill: "pill-submitted",  dot: "#94A3B8", bar: "#94A3B8" },
+    "Under Review":     { pill: "pill-review",      dot: "#F59E0B", bar: "#F59E0B" },
+    "Legal Check":      { pill: "pill-legal",       dot: "#8B5CF6", bar: "#8B5CF6" },
+    "Compliance Check": { pill: "pill-compliance",  dot: "#3B82F6", bar: "#3B82F6" },
+    "Approved":         { pill: "pill-approved",    dot: "#10B981", bar: "#10B981" },
+    "Rejected":         { pill: "pill-rejected",    dot: "#EF4444", bar: "#EF4444" },
+  };
+
+  function statusPill(status) {
+    const cfg = STATUS_COLORS[status] || STATUS_COLORS["Form Submitted"];
+    return `<span class="status-pill ${cfg.pill}">
+      <span class="pill-dot" style="background:${cfg.dot}"></span>
+      ${status}
+    </span>`;
+  }
+
+  function scoreMini(score) {
+    return `<div class="score-mini">
+      <div class="score-mini-bar"><div class="score-mini-fill" style="width:${score}%"></div></div>
+      <span class="score-mini-val">${score}</span>
+    </div>`;
+  }
+
+  function recClass(rec) {
+    if (rec === "Approve") return "rec-approve";
+    if (rec === "Reject")  return "rec-reject";
+    return "rec-review";
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return "";
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60)  return `${mins}m ago`;
+    if (mins < 1440) return `${Math.floor(mins/60)}h ago`;
+    return `${Math.floor(mins/1440)}d ago`;
+  }
+
+  async function loadAll() {
+    const [dashRes, queueRes] = await Promise.all([
+      fetch("/api/dashboard"),
+      fetch("/api/all-lps")
+    ]);
+    const dash  = await dashRes.json();
+    const allLps = queueRes.ok ? await queueRes.json() : [];
+    return { dash, allLps };
+  }
+
+  async function loadDashboard() {
+    document.getElementById("loading").classList.add("visible");
+
+    try {
+      const dashRes = await fetch("/api/dashboard");
+      const dash = await dashRes.json();
+
+      // All LPs: use recentSubmissions for now (server returns last 5)
+      // We'll load all via a separate call if available
+      let allLps = dash.recentSubmissions || [];
+
+      renderStats(dash);
+      renderBreakdown(dash.byStatus, dash.total);
+      renderLPTable(allLps);
+      renderActivity(allLps.slice(0, 5));
+
+      document.getElementById("last-updated").textContent =
+        "Updated " + new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+
+    } catch (e) {
+      console.error("Dashboard load error:", e);
+    } finally {
+      document.getElementById("loading").classList.remove("visible");
+    }
+  }
+
+  function renderStats(dash) {
+    document.getElementById("stat-total").textContent = dash.total ?? "0";
+    document.getElementById("stat-avg").textContent   = dash.avgScore ?? "—";
+
+    const byStatus = dash.byStatus || {};
+    const reviewing = (byStatus["Under Review"] || 0) +
+                      (byStatus["Legal Check"] || 0) +
+                      (byStatus["Compliance Check"] || 0);
+    document.getElementById("stat-review").textContent = reviewing;
+
+    const approved = byStatus["Approved"] || 0;
+    document.getElementById("stat-approved").textContent = approved;
+    document.getElementById("stat-approved-pct").textContent =
+      dash.total ? `${Math.round(approved / dash.total * 100)}% conversion` : "No submissions yet";
+  }
+
+  function renderBreakdown(byStatus, total) {
+    const el = document.getElementById("breakdown-list");
+    if (!byStatus || Object.keys(byStatus).length === 0) {
+      el.innerHTML = `<div class="empty-state" style="padding:1.5rem">
+        <div style="font-size:0.85rem;color:var(--slate)">No data yet</div></div>`;
+      return;
+    }
+
+    const ORDER = ["Form Submitted","Under Review","Legal Check","Compliance Check","Approved","Rejected"];
+    const items = ORDER.filter(s => byStatus[s]).map(s => ({ status: s, count: byStatus[s] }));
+    // Add any unlisted statuses
+    Object.entries(byStatus).forEach(([s, c]) => {
+      if (!ORDER.includes(s)) items.push({ status: s, count: c });
+    });
+
+    el.innerHTML = items.map(({ status, count }) => {
+      const cfg = STATUS_COLORS[status] || { dot: "#94A3B8", bar: "#94A3B8" };
+      const pct = total ? Math.round(count / total * 100) : 0;
+      return `<div class="breakdown-item">
+        <div class="breakdown-label">
+          <div class="bd-dot" style="background:${cfg.dot}"></div>
+          ${status}
+        </div>
+        <div class="breakdown-bar-wrap">
+          <div class="breakdown-bar">
+            <div class="breakdown-bar-fill" style="width:${pct}%;background:${cfg.bar}"></div>
+          </div>
+        </div>
+        <div class="breakdown-count">${count}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderLPTable(lps) {
+    const wrap = document.getElementById("lp-table-wrap");
+    document.getElementById("lp-count").textContent = lps.length + " LP" + (lps.length !== 1 ? "s" : "");
+
+    if (!lps.length) {
+      wrap.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No LP submissions yet</h3>
+        <p>Submit the LP form to see investors appear here.</p>
+      </div>`;
+      return;
+    }
+
+    // Sort: most recent first
+    const sorted = [...lps].sort((a, b) =>
+      new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
+
+    wrap.innerHTML = `<div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>LP Name</th>
+            <th>Type</th>
+            <th>Committed (€k)</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Notion</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(lp => `<tr>
+            <td>
+              <div class="lp-name-cell">${esc(lp.lpName)}</div>
+              <div class="lp-email-cell">${esc(lp.email)}</div>
+            </td>
+            <td>${esc(lp.investorType || "—")}</td>
+            <td>€${parseFloat(lp.committedAmount || 0).toLocaleString()}k</td>
+            <td>${statusPill(lp.status || "Form Submitted")}</td>
+            <td>${scoreMini(lp.review?.score ?? 0)}</td>
+            <td>${lp.notionId
+              ? `<a class="notion-link" href="https://notion.so/${lp.notionId.replace(/-/g,'')}" target="_blank">Open ↗</a>`
+              : `<span style="color:var(--slate);font-size:0.78rem">Local only</span>`
+            }</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  function renderActivity(recent) {
+    const el = document.getElementById("activity-list");
+    if (!recent || !recent.length) {
+      el.innerHTML = `<div class="empty-state" style="padding:1.5rem">
+        <div style="font-size:0.85rem;color:var(--slate)">No recent activity</div></div>`;
+      return;
+    }
+    el.innerHTML = recent.map(lp => `<div class="activity-item">
+      <div class="act-name">${esc(lp.lpName)}</div>
+      <div class="act-meta">${esc(lp.fund || "—")} · ${timeAgo(lp.submittedAt)}</div>
+      <div class="act-rec ${recClass(lp.review?.recommendation)}">
+        ${lp.review?.recommendation || "Pending"}
+      </div>
+    </div>`).join("");
+  }
+
+  function esc(str) {
+    const d = document.createElement("div");
+    d.textContent = str || "—";
+    return d.innerHTML;
+  }
+
+  // Auto-refresh every 30s
+  loadDashboard();
+  setInterval(loadDashboard, 30000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard — LP Status Portal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #1A2E44;
+      --teal:   #0D9488;
+      --teal-l: #14B8A8;
+      --off-w:  #F8FAFC;
+      --slate:  #64748B;
+      --light:  #E2E8F0;
+      --danger: #EF4444;
+      --warn:   #F59E0B;
+      --ok:     #10B981;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--off-w);
+      color: #1E293B;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy);
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-mark {
+      width: 34px; height: 34px; background: var(--teal);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; color: #fff; font-size: 15px;
+    }
+    .logo-text { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.3px; }
+    .header-tag {
+      background: rgba(13,148,136,.25); color: var(--teal-l);
+      padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+
+    /* ── Lookup ── */
+    .lookup-wrap {
+      max-width: 640px; margin: 60px auto 0; padding: 0 1.5rem;
+    }
+    .lookup-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .lookup-card h1 { font-size: 1.5rem; font-weight: 700; color: var(--navy); margin-bottom: 0.5rem; }
+    .lookup-card p { color: var(--slate); font-size: 0.93rem; margin-bottom: 1.8rem; }
+    .search-row { display: flex; gap: 10px; }
+    .search-row input {
+      flex: 1; padding: 12px 16px; border: 2px solid var(--light);
+      border-radius: 10px; font-size: 0.95rem; outline: none;
+      transition: border-color .2s;
+    }
+    .search-row input:focus { border-color: var(--teal); }
+    .search-row button {
+      padding: 12px 22px; background: var(--teal); color: #fff;
+      border: none; border-radius: 10px; font-weight: 600;
+      font-size: 0.9rem; cursor: pointer; transition: background .2s;
+      white-space: nowrap;
+    }
+    .search-row button:hover { background: var(--teal-l); }
+
+    .error-msg {
+      margin-top: 1rem; padding: 10px 14px;
+      background: #FEF2F2; color: var(--danger);
+      border-radius: 8px; font-size: 0.88rem;
+      display: none;
+    }
+
+    /* ── Status card ── */
+    #status-panel {
+      max-width: 720px; margin: 2.5rem auto 4rem; padding: 0 1.5rem;
+      display: none;
+    }
+
+    .lp-header {
+      background: var(--navy);
+      border-radius: 16px 16px 0 0;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .lp-name { color: #fff; font-size: 1.35rem; font-weight: 700; }
+    .lp-meta { color: #94A3B8; font-size: 0.85rem; margin-top: 2px; }
+
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 30px;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .chip-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* Status colours */
+    .status-submitted   { background: rgba(100,116,139,.25); color: #CBD5E1; }
+    .status-submitted .chip-dot   { background: #94A3B8; }
+    .status-under-review { background: rgba(245,158,11,.2); color: #FCD34D; }
+    .status-under-review .chip-dot { background: var(--warn); }
+    .status-legal        { background: rgba(139,92,246,.2); color: #C4B5FD; }
+    .status-legal .chip-dot        { background: #8B5CF6; }
+    .status-compliance   { background: rgba(59,130,246,.2); color: #93C5FD; }
+    .status-compliance .chip-dot   { background: #3B82F6; }
+    .status-approved     { background: rgba(16,185,129,.2); color: #6EE7B7; }
+    .status-approved .chip-dot     { background: var(--ok); }
+    .status-rejected     { background: rgba(239,68,68,.2); color: #FCA5A5; }
+    .status-rejected .chip-dot     { background: var(--danger); }
+
+    .lp-body { background: #fff; border-radius: 0 0 16px 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+
+    /* ── Pipeline tracker ── */
+    .pipeline-section { padding: 2rem 2rem 0; }
+    .pipeline-section h2 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--slate); margin-bottom: 1.2rem; }
+
+    .pipeline-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .pipeline-step {
+      display: flex; align-items: center; flex: 1; min-width: 0;
+    }
+    .step-bubble {
+      flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      border: 2px solid var(--light);
+      background: #fff; color: var(--slate);
+      position: relative; z-index: 1;
+      transition: all .3s;
+    }
+    .step-bubble.done   { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .step-bubble.active { background: var(--navy); border-color: var(--navy); color: #fff;
+      box-shadow: 0 0 0 4px rgba(13,148,136,.2); }
+    .step-connector {
+      flex: 1; height: 2px; background: var(--light); min-width: 12px;
+      transition: background .3s;
+    }
+    .step-connector.done { background: var(--teal); }
+
+    .step-labels { display: flex; gap: 0; margin-top: 8px; }
+    .step-label { flex: 1; font-size: 0.72rem; color: var(--slate);
+      text-align: center; padding: 0 2px; line-height: 1.3; }
+    .step-label.active { color: var(--navy); font-weight: 700; }
+    .step-label.done   { color: var(--teal); }
+
+    /* ── Score ── */
+    .score-section {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--light);
+    }
+    .score-label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .score-label span:first-child { font-size: 0.78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--slate); }
+    .score-value { font-size: 1.4rem; font-weight: 800; color: var(--navy); }
+    .score-bar {
+      height: 10px; background: var(--light); border-radius: 8px; overflow: hidden;
+    }
+    .score-fill {
+      height: 100%; border-radius: 8px;
+      transition: width 1s ease;
+      background: linear-gradient(90deg, var(--teal), var(--teal-l));
+    }
+
+    /* ── AI Review ── */
+    .review-section {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--light);
+    }
+    .section-title {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--slate); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ai-badge {
+      background: linear-gradient(90deg, var(--teal), #8B5CF6);
+      color: #fff; padding: 2px 8px; border-radius: 20px;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.4px;
+    }
+
+    .review-summary {
+      background: var(--off-w); border-radius: 10px;
+      padding: 1rem 1.2rem; font-size: 0.9rem;
+      line-height: 1.6; color: #334155;
+      border-left: 3px solid var(--teal);
+      margin-bottom: 1rem;
+    }
+
+    .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .review-item {
+      background: var(--off-w); border-radius: 10px;
+      padding: 0.8rem 1rem;
+    }
+    .review-item-label { font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--slate); margin-bottom: 4px; font-weight: 600; }
+    .review-item-value { font-size: 0.9rem; font-weight: 600; color: var(--navy); }
+
+    .flag-clear  { color: var(--ok); }
+    .flag-warn   { color: var(--warn); }
+    .flag-danger { color: var(--danger); }
+
+    /* ── Missing items ── */
+    .missing-section {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--light);
+    }
+    .missing-list { list-style: none; }
+    .missing-list li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 0; font-size: 0.88rem; color: #334155;
+      border-bottom: 1px solid var(--light);
+    }
+    .missing-list li:last-child { border-bottom: none; }
+    .missing-icon { font-size: 1rem; }
+
+    /* ── Footer ── */
+    .lp-footer {
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--light);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .lp-footer-meta { font-size: 0.8rem; color: var(--slate); }
+    .contact-link {
+      font-size: 0.82rem; color: var(--teal); text-decoration: none; font-weight: 600;
+    }
+    .contact-link:hover { text-decoration: underline; }
+
+    /* ── Loading ── */
+    .loading-spinner {
+      width: 40px; height: 40px; border: 3px solid var(--light);
+      border-top-color: var(--teal); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 2rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Not found ── */
+    .not-found-msg {
+      text-align: center; padding: 3rem 2rem;
+      display: none;
+    }
+    .not-found-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    .not-found-msg h2 { color: var(--navy); margin-bottom: 0.5rem; }
+    .not-found-msg p { color: var(--slate); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <div class="logo-mark">OB</div>
+    <span class="logo-text">Onboard</span>
+  </a>
+  <div class="header-tag">LP Portal</div>
+</header>
+
+<!-- Lookup -->
+<div class="lookup-wrap">
+  <div class="lookup-card">
+    <h1>Track Your Application</h1>
+    <p>Enter your LP reference ID to check your onboarding status and review progress.</p>
+    <div class="search-row">
+      <input type="text" id="lp-id-input" placeholder="LP-1234567890…" />
+      <button onclick="lookupLP()">Check Status</button>
+    </div>
+    <div class="error-msg" id="error-msg">LP not found. Please check your reference ID and try again.</div>
+  </div>
+</div>
+
+<!-- Status panel -->
+<div id="status-panel">
+  <div class="lp-header">
+    <div>
+      <div class="lp-name" id="lp-name">—</div>
+      <div class="lp-meta" id="lp-meta">—</div>
+    </div>
+    <div class="status-chip" id="status-chip">
+      <div class="chip-dot"></div>
+      <span id="status-text">—</span>
+    </div>
+  </div>
+
+  <div class="lp-body">
+
+    <!-- Pipeline tracker -->
+    <div class="pipeline-section">
+      <h2>Pipeline Position</h2>
+      <div class="pipeline-track" id="pipeline-track"></div>
+      <div class="step-labels" id="step-labels"></div>
+    </div>
+
+    <!-- Score -->
+    <div class="score-section">
+      <div class="score-label">
+        <span>Onboarding Score</span>
+        <span class="score-value" id="score-val">—</span>
+      </div>
+      <div class="score-bar"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- AI Review -->
+    <div class="review-section">
+      <div class="section-title">
+        AI Compliance Review
+        <span class="ai-badge">Claude AI</span>
+      </div>
+      <div class="review-summary" id="review-summary">Awaiting review…</div>
+      <div class="review-grid">
+        <div class="review-item">
+          <div class="review-item-label">Recommendation</div>
+          <div class="review-item-value" id="rev-recommendation">—</div>
+        </div>
+        <div class="review-item">
+          <div class="review-item-label">PEP Status</div>
+          <div class="review-item-value" id="rev-pep">—</div>
+        </div>
+        <div class="review-item">
+          <div class="review-item-label">Sanctions Check</div>
+          <div class="review-item-value" id="rev-sanctions">—</div>
+        </div>
+        <div class="review-item">
+          <div class="review-item-label">Fund</div>
+          <div class="review-item-value" id="rev-fund">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Missing items -->
+    <div class="missing-section" id="missing-section">
+      <div class="section-title">Action Items</div>
+      <ul class="missing-list" id="missing-list"></ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="lp-footer">
+      <div class="lp-footer-meta">
+        Submitted: <span id="submitted-at">—</span> &nbsp;·&nbsp; ID: <span id="lp-id-display">—</span>
+      </div>
+      <a href="mailto:operations@feltencp.com" class="contact-link">Contact GP Operations →</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const PIPELINE_STEPS = [
+    { key: "Form Submitted",   label: "Form\nSubmitted" },
+    { key: "Under Review",     label: "Under\nReview" },
+    { key: "Legal Check",      label: "Legal\nCheck" },
+    { key: "Compliance Check", label: "Compliance\nCheck" },
+    { key: "Approved",         label: "Approved" },
+  ];
+
+  const STATUS_CHIP_MAP = {
+    "Form Submitted":   "status-submitted",
+    "Under Review":     "status-under-review",
+    "Legal Check":      "status-legal",
+    "Compliance Check": "status-compliance",
+    "Approved":         "status-approved",
+    "Rejected":         "status-rejected",
+  };
+
+  function sanitize(str) {
+    const d = document.createElement("div");
+    d.textContent = str || "";
+    return d.innerHTML;
+  }
+
+  function buildPipeline(currentStatus) {
+    const track  = document.getElementById("pipeline-track");
+    const labels = document.getElementById("step-labels");
+    track.innerHTML  = "";
+    labels.innerHTML = "";
+
+    const currentIndex = PIPELINE_STEPS.findIndex(s => s.key === currentStatus);
+
+    PIPELINE_STEPS.forEach((step, i) => {
+      const stepEl = document.createElement("div");
+      stepEl.className = "pipeline-step";
+
+      const bubble = document.createElement("div");
+      bubble.className = "step-bubble";
+
+      if (i < currentIndex) {
+        bubble.classList.add("done");
+        bubble.textContent = "✓";
+      } else if (i === currentIndex) {
+        bubble.classList.add("active");
+        bubble.textContent = i + 1;
+      } else {
+        bubble.textContent = i + 1;
+      }
+
+      stepEl.appendChild(bubble);
+
+      if (i < PIPELINE_STEPS.length - 1) {
+        const connector = document.createElement("div");
+        connector.className = "step-connector" + (i < currentIndex ? " done" : "");
+        stepEl.appendChild(connector);
+      }
+
+      track.appendChild(stepEl);
+
+      const labelEl = document.createElement("div");
+      labelEl.className = "step-label" + (i === currentIndex ? " active" : "") + (i < currentIndex ? " done" : "");
+      labelEl.textContent = step.label.replace("\\n", "\n");
+      labels.appendChild(labelEl);
+    });
+  }
+
+  function setStatusChip(status) {
+    const chip = document.getElementById("status-chip");
+    chip.className = "status-chip " + (STATUS_CHIP_MAP[status] || "status-submitted");
+    document.getElementById("status-text").textContent = status;
+  }
+
+  function getRecClass(rec) {
+    if (rec === "Approve") return "flag-clear";
+    if (rec === "Reject")  return "flag-danger";
+    return "flag-warn";
+  }
+
+  function getSanctionsClass(s) {
+    if (s === "Clear")   return "flag-clear";
+    if (s === "Flagged") return "flag-danger";
+    return "flag-warn";
+  }
+
+  function getPepClass(p) {
+    if (p === "Not PEP") return "flag-clear";
+    if (p === "PEP")     return "flag-danger";
+    return "flag-warn";
+  }
+
+  async function lookupLP() {
+    const input = document.getElementById("lp-id-input").value.trim();
+    const errEl = document.getElementById("error-msg");
+    const panel = document.getElementById("status-panel");
+
+    if (!input) return;
+
+    errEl.style.display = "none";
+    panel.style.display = "none";
+
+    try {
+      const res = await fetch(`/api/status/${encodeURIComponent(input)}`);
+      if (!res.ok) {
+        errEl.style.display = "block";
+        return;
+      }
+      const lp = await res.json();
+      renderLP(lp);
+    } catch (e) {
+      errEl.textContent = "Network error. Please try again.";
+      errEl.style.display = "block";
+    }
+  }
+
+  function renderLP(lp) {
+    // Header
+    document.getElementById("lp-name").textContent = lp.lpName || "—";
+    document.getElementById("lp-meta").textContent =
+      `${lp.investorType || "Investor"} · ${lp.nationality || ""} · ${lp.fund || ""}`;
+    setStatusChip(lp.status);
+
+    // Pipeline
+    const displayStatus = (lp.status === "Rejected") ? "Rejected" : (lp.status || "Form Submitted");
+    buildPipeline(displayStatus);
+
+    // Score
+    const score = lp.review?.score ?? 0;
+    document.getElementById("score-val").textContent = score + " / 100";
+    setTimeout(() => {
+      document.getElementById("score-fill").style.width = score + "%";
+    }, 100);
+
+    // AI review
+    document.getElementById("review-summary").textContent =
+      lp.review?.summary || "Review pending.";
+
+    const recEl = document.getElementById("rev-recommendation");
+    recEl.textContent = lp.review?.recommendation || "Pending";
+    recEl.className = "review-item-value " + getRecClass(lp.review?.recommendation);
+
+    const pepEl = document.getElementById("rev-pep");
+    pepEl.textContent = lp.review?.pep_status || "Pending Check";
+    pepEl.className = "review-item-value " + getPepClass(lp.review?.pep_status);
+
+    const sanctEl = document.getElementById("rev-sanctions");
+    sanctEl.textContent = lp.review?.sanctions_clear || "Pending";
+    sanctEl.className = "review-item-value " + getSanctionsClass(lp.review?.sanctions_clear);
+
+    document.getElementById("rev-fund").textContent = lp.fund || "—";
+
+    // Missing items
+    const missing = lp.review?.missing_items || "";
+    const missingSection = document.getElementById("missing-section");
+    const missingList = document.getElementById("missing-list");
+    missingList.innerHTML = "";
+
+    if (missing && missing !== "None") {
+      const items = missing.split(",").map(s => s.trim()).filter(Boolean);
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="missing-icon">⚠️</span>${sanitize(item)}`;
+        missingList.appendChild(li);
+      });
+      missingSection.style.display = "block";
+    } else {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="missing-icon">✅</span>All items received`;
+      missingList.appendChild(li);
+      missingSection.style.display = "block";
+    }
+
+    // Footer
+    document.getElementById("submitted-at").textContent =
+      lp.submittedAt ? new Date(lp.submittedAt).toLocaleDateString("en-GB", {
+        day: "numeric", month: "short", year: "numeric"
+      }) : "—";
+    document.getElementById("lp-id-display").textContent = lp.id || "—";
+
+    document.getElementById("status-panel").style.display = "block";
+    document.getElementById("status-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Auto-load from URL param
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    if (id) {
+      document.getElementById("lp-id-input").value = id;
+      lookupLP();
+    }
+  });
+
+  // Enter key
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("lp-id-input").addEventListener("keydown", e => {
+      if (e.key === "Enter") lookupLP();
+    });
+  });
+</script>
+
+</body>
+</html>
