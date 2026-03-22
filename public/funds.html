@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard — Funds</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1A2E44; --teal: #0D9488; --teal-l: #14B8A8; --teal-bg: #F0FDFA;
+      --off-w: #F8FAFC; --slate: #64748B; --light: #E2E8F0;
+      --danger: #EF4444; --warn: #F59E0B; --ok: #10B981; --purple: #8B5CF6; --blue: #3B82F6;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+           background: var(--off-w); color: #1E293B; min-height: 100vh; }
+    .layout { display: flex; min-height: 100vh; }
+
+    aside { width: 220px; background: var(--navy); flex-shrink: 0; display: flex; flex-direction: column; }
+    .sidebar-logo { padding: 1.4rem 1.5rem 1rem; display: flex; align-items: center; gap: 10px;
+                    border-bottom: 1px solid rgba(255,255,255,.08); }
+    .logo-mark { width: 34px; height: 34px; background: var(--teal); border-radius: 8px;
+                 display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 15px; }
+    .sidebar-logo span { color: #fff; font-weight: 700; font-size: 1rem; }
+    .sidebar-section { padding: 1rem 1rem 0.5rem; font-size: 0.68rem; font-weight: 700;
+                       text-transform: uppercase; letter-spacing: 1.2px; color: #5E8FAD; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 1.5rem;
+                font-size: 0.87rem; color: #94A3B8; text-decoration: none; transition: all .2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .nav-item.active { color: #fff; background: rgba(13,148,136,.2); border-right: 3px solid var(--teal); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.08);
+                      font-size: 0.78rem; color: #5E8FAD; }
+
+    main { flex: 1; overflow-y: auto; }
+    .topbar { background: #fff; border-bottom: 1px solid var(--light); padding: 0 2rem;
+              height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .topbar h1 { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
+    .topbar-right { display: flex; align-items: center; gap: .75rem; }
+    .btn-top { padding: 7px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+               cursor: pointer; border: none; transition: all .2s; display: flex; align-items: center; gap: 5px; }
+    .btn-teal  { background: var(--teal); color: #fff; }
+    .btn-teal:hover  { background: var(--teal-l); }
+    .btn-ghost { background: transparent; color: var(--slate); border: 1.5px solid var(--light); }
+    .btn-ghost:hover { background: var(--off-w); }
+
+    .content { padding: 1.8rem 2rem; }
+
+    /* Fund grid */
+    .fund-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+
+    /* Fund card */
+    .fund-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,.07);
+                 border: 1px solid var(--light); overflow: hidden; transition: all .2s; }
+    .fund-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.12); transform: translateY(-2px); }
+
+    .fund-card-header { background: var(--navy); padding: 1.4rem 1.5rem; }
+    .fund-name { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    .fund-strategy { font-size: 0.78rem; color: #8EADC7; }
+    .fund-status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px;
+                         font-size: 0.72rem; font-weight: 700; margin-top: 0.5rem; }
+    .status-fundraising { background: rgba(13,148,136,.2); color: var(--teal-l); }
+    .status-closed      { background: rgba(100,116,139,.2); color: #94A3B8; }
+    .status-deployed    { background: rgba(139,92,246,.2); color: #C4B5FD; }
+
+    .fund-card-body { padding: 1.2rem 1.5rem; }
+
+    .fund-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1.2rem; }
+    .fund-metric .m-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;
+                             color: #94A3B8; font-weight: 700; margin-bottom: 0.2rem; }
+    .fund-metric .m-value { font-size: 1.1rem; font-weight: 800; color: var(--navy); }
+    .fund-metric .m-sub   { font-size: 0.7rem; color: var(--slate); }
+
+    /* AUM progress */
+    .aum-wrap { margin-bottom: 1.2rem; }
+    .aum-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .aum-label  { font-size: 0.75rem; font-weight: 600; color: var(--slate); }
+    .aum-pct    { font-size: 0.75rem; font-weight: 700; color: var(--teal); }
+    .aum-bar-bg { height: 7px; background: var(--light); border-radius: 4px; overflow: hidden; }
+    .aum-bar-fill { height: 100%; border-radius: 4px;
+                    background: linear-gradient(90deg, var(--teal), var(--teal-l)); transition: width .8s ease; }
+
+    /* Status breakdown mini */
+    .status-breakdown { margin-bottom: 1.2rem; }
+    .status-breakdown .sb-label { font-size: 0.72rem; font-weight: 700; color: var(--slate);
+                                   text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+    .sb-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 4px; }
+    .sb-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sb-name { font-size: 0.75rem; color: var(--slate); flex: 1; }
+    .sb-count { font-size: 0.75rem; font-weight: 700; color: var(--navy); min-width: 18px; text-align: right; }
+    .sb-bar-bg { width: 60px; height: 4px; background: var(--light); border-radius: 2px; }
+    .sb-bar-fill { height: 100%; border-radius: 2px; }
+
+    /* Reg badges */
+    .reg-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+    .reg-badge { padding: 3px 9px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
+                 background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+
+    .fund-card-footer { padding: 0.9rem 1.5rem; border-top: 1px solid var(--light);
+                        display: flex; align-items: center; justify-content: space-between; }
+    .notion-link { display: inline-flex; align-items: center; gap: 5px; color: var(--slate);
+                   font-size: 0.78rem; text-decoration: none; padding: 4px 10px;
+                   border: 1px solid var(--light); border-radius: 7px; transition: all .15s; }
+    .notion-link:hover { background: var(--light); color: var(--navy); }
+    .edit-btn { padding: 5px 14px; background: var(--teal); color: #fff; border: none;
+                border-radius: 7px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+    .edit-btn:hover { background: var(--teal-l); }
+
+    /* Add fund form */
+    .add-fund-section { margin-bottom: 1.5rem; }
+    .add-toggle { display: flex; align-items: center; gap: 0.5rem; background: #fff;
+                  border: 1.5px dashed var(--teal); border-radius: 12px; padding: 1rem 1.5rem;
+                  cursor: pointer; color: var(--teal); font-weight: 600; font-size: 0.88rem;
+                  transition: all .2s; }
+    .add-toggle:hover { background: var(--teal-bg); }
+    .add-form { display: none; background: #fff; border-radius: 12px; border: 1px solid var(--light);
+                padding: 1.5rem; margin-top: 0.75rem; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .add-form.open { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.04em; color: var(--navy); }
+    .form-group input, .form-group select {
+      border: 1.5px solid var(--light); border-radius: 8px; padding: 0.55rem 0.75rem;
+      font-size: 0.88rem; outline: none; color: var(--slate); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--teal); }
+    .submit-btn { padding: 0.65rem 2rem; background: var(--teal); color: #fff; border: none;
+                  border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 1rem; }
+    .submit-btn:hover { background: var(--teal-l); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: .7rem 1.2rem;
+             background: var(--navy); color: #fff; border-radius: 10px; font-size: .85rem;
+             font-weight: 600; z-index: 999; opacity: 0; transform: translateY(10px); transition: all .3s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-ok  { background: #0F766E; }
+    .toast-err { background: #991B1B; }
+
+    .spinner-wrap { display: none; position: fixed; inset: 0; background: rgba(255,255,255,.6);
+                    align-items: center; justify-content: center; z-index: 999; }
+    .spinner-wrap.visible { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--light);
+               border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 680px) { aside { display: none; } .fund-metrics { grid-template-columns: 1fr 1fr; } .form-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="spinner-wrap" id="loading"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-logo">
+      <div class="logo-mark">OB</div>
+      <span>Onboard</span>
+    </div>
+    <div class="sidebar-section">GP Workspace</div>
+    <a class="nav-item" href="/gp"><span class="nav-icon">📊</span> LP Pipeline</a>
+    <a class="nav-item" href="/compliance"><span class="nav-icon">✅</span> Compliance</a>
+    <a class="nav-item active" href="/funds"><span class="nav-icon">💼</span> Funds</a>
+    <a class="nav-item" href="/" target="_blank"><span class="nav-icon">📝</span> LP Form</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <div id="sidebar-user" style="color:#94A3B8;margin-bottom:6px;">—</div>
+      <div class="sidebar-fund" id="sidebar-fund-name">Felten Capital Fund I</div>
+      <div style="margin-top:3px;">PE · Switzerland · AIFMD</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <h1>Fund Management</h1>
+      <div class="topbar-right">
+        <button class="btn-top btn-teal" onclick="loadFunds()">↻ Refresh</button>
+        <button class="btn-top btn-ghost" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Add fund -->
+      <div class="add-fund-section" id="add-fund-section" style="display:none">
+        <div class="add-toggle" onclick="toggleAddForm()">
+          <span style="font-size:1.2rem">＋</span> Add New Fund
+        </div>
+        <div class="add-form" id="add-form">
+          <div style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem">New Fund</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Fund Name *</label>
+              <input type="text" id="f-name" placeholder="e.g. Felten Capital Fund II">
+            </div>
+            <div class="form-group">
+              <label>Strategy</label>
+              <select id="f-strategy">
+                <option>Private Equity</option><option>Venture Capital</option>
+                <option>Real Estate</option><option>Private Debt</option>
+                <option>Infrastructure</option><option>Hedge Fund</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>AUM / Raised (M)</label>
+              <input type="number" id="f-aum" placeholder="350">
+            </div>
+            <div class="form-group">
+              <label>Target Size (M)</label>
+              <input type="number" id="f-target" placeholder="500">
+            </div>
+            <div class="form-group">
+              <label>Currency</label>
+              <select id="f-currency">
+                <option>EUR</option><option>CHF</option><option>USD</option><option>GBP</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Vintage Year</label>
+              <input type="number" id="f-vintage" placeholder="2025">
+            </div>
+            <div class="form-group">
+              <label>Domicile</label>
+              <select id="f-domicile">
+                <option>Luxembourg</option><option>Switzerland</option><option>Cayman Islands</option>
+                <option>Ireland</option><option>Jersey</option><option>United Kingdom</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Min Ticket (€k)</label>
+              <input type="number" id="f-min" placeholder="500">
+            </div>
+          </div>
+          <button class="submit-btn" onclick="addFund()">Create Fund</button>
+        </div>
+      </div>
+
+      <!-- Fund cards -->
+      <div class="fund-grid" id="fund-grid">
+        <div style="text-align:center;padding:3rem;color:var(--slate);grid-column:1/-1">
+          Loading funds…
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const STATUS_COLORS = {
+  "Form Submitted":   "#94A3B8", "Under Review": "#F59E0B",
+  "Legal Check":      "#8B5CF6", "Compliance Check": "#3B82F6",
+  "Approved":         "#10B981", "Rejected": "#EF4444",
+};
+
+function esc(s) { const d = document.createElement("div"); d.textContent = s||"—"; return d.innerHTML; }
+function toast(msg, type="ok") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = `toast toast-${type} show`;
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+async function logout() { await fetch("/auth/logout", { method: "POST" }); window.location.href = "/login"; }
+
+function fmt(n, currency = "€") { return currency + parseFloat(n||0).toLocaleString() + "M"; }
+
+function fundCard(f) {
+  const aumPct = f.aumTarget ? Math.min(Math.round(f.aum / f.aumTarget * 100), 100) : 0;
+  const statusClass = f.status === "Fundraising" ? "status-fundraising"
+    : f.status === "Deployed" ? "status-deployed" : "status-closed";
+  const reg = (f.regFramework || []).map(r => `<span class="reg-badge">${r}</span>`).join("");
+
+  // Status breakdown
+  const statuses = Object.entries(f.byStatus || {});
+  const sbRows = statuses.length ? statuses.map(([s, c]) => {
+    const pct = f.lpCount ? Math.round(c/f.lpCount*100) : 0;
+    const color = STATUS_COLORS[s] || "#94A3B8";
+    return `<div class="sb-row">
+      <div class="sb-dot" style="background:${color}"></div>
+      <div class="sb-name">${s}</div>
+      <div class="sb-bar-bg"><div class="sb-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="sb-count">${c}</div>
+    </div>`;
+  }).join("") : `<div style="font-size:.75rem;color:#94A3B8">No LPs yet</div>`;
+
+  return `<div class="fund-card">
+    <div class="fund-card-header">
+      <div class="fund-name">${esc(f.name)}</div>
+      <div class="fund-strategy">${esc(f.strategy)} · ${esc(f.domicile)} · Vintage ${f.vintage||"—"}</div>
+      <span class="fund-status-badge ${statusClass}">${f.status || "Fundraising"}</span>
+    </div>
+    <div class="fund-card-body">
+      <div class="fund-metrics">
+        <div class="fund-metric">
+          <div class="m-label">AUM / Raised</div>
+          <div class="m-value">${fmt(f.aum, f.aumCurrency === "CHF" ? "CHF " : "€")}</div>
+          <div class="m-sub">of ${fmt(f.aumTarget, f.aumCurrency === "CHF" ? "CHF " : "€")} target</div>
+        </div>
+        <div class="fund-metric">
+          <div class="m-label">LP Count</div>
+          <div class="m-value">${f.lpCount || 0}</div>
+          <div class="m-sub">Investors</div>
+        </div>
+        <div class="fund-metric">
+          <div class="m-label">Committed</div>
+          <div class="m-value">€${parseFloat(f.totalCommitted||0).toLocaleString()}k</div>
+          <div class="m-sub">From LPs</div>
+        </div>
+      </div>
+
+      <div class="aum-wrap">
+        <div class="aum-header">
+          <span class="aum-label">Fundraising Progress</span>
+          <span class="aum-pct">${aumPct}%</span>
+        </div>
+        <div class="aum-bar-bg"><div class="aum-bar-fill" style="width:${aumPct}%"></div></div>
+      </div>
+
+      <div class="reg-badges">${reg || '<span style="font-size:.75rem;color:#94A3B8">No regulatory framework set</span>'}</div>
+
+      <div class="status-breakdown">
+        <div class="sb-label">LP Status Breakdown</div>
+        ${sbRows}
+      </div>
+    </div>
+    <div class="fund-card-footer">
+      ${f.notionId
+        ? `<a class="notion-link" href="https://notion.so/${f.notionId.replace(/-/g,'')}" target="_blank">
+             Open in Notion ↗
+           </a>`
+        : `<span style="font-size:.75rem;color:#94A3B8">Not synced to Notion</span>`}
+      <button class="edit-btn" onclick="viewFundLPs('${esc(f.name)}')">View LPs →</button>
+    </div>
+  </div>`;
+}
+
+function viewFundLPs(fundName) {
+  window.location.href = `/gp?fund=${encodeURIComponent(fundName)}`;
+}
+
+async function loadFunds() {
+  document.getElementById("loading").classList.add("visible");
+  try {
+    const res = await fetch("/api/funds");
+    if (res.status === 401) { window.location.href = "/login?redirect=/funds"; return; }
+    const funds = await res.json();
+    document.getElementById("fund-grid").innerHTML = funds.length
+      ? funds.map(fundCard).join("")
+      : `<div style="text-align:center;padding:3rem;color:var(--slate);grid-column:1/-1">No funds yet.</div>`;
+  } catch(e) {
+    toast("Failed to load funds", "err");
+  } finally {
+    document.getElementById("loading").classList.remove("visible");
+  }
+}
+
+function toggleAddForm() {
+  document.getElementById("add-form").classList.toggle("open");
+}
+
+async function addFund() {
+  const name = document.getElementById("f-name").value.trim();
+  if (!name) { toast("Fund name is required", "err"); return; }
+  const body = {
+    name, strategy: document.getElementById("f-strategy").value,
+    aum: document.getElementById("f-aum").value,
+    aumTarget: document.getElementById("f-target").value,
+    aumCurrency: document.getElementById("f-currency").value,
+    vintage: document.getElementById("f-vintage").value,
+    domicile: document.getElementById("f-domicile").value,
+    minTicket: document.getElementById("f-min").value,
+    regFramework: [],
+  };
+  try {
+    const res = await fetch("/api/funds", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    toast("✓ Fund created");
+    document.getElementById("add-form").classList.remove("open");
+    loadFunds();
+  } catch(e) { toast("Error: " + e.message, "err"); }
+}
+
+// Auth
+fetch("/auth/me").then(r => {
+  if (r.status === 401) { window.location.href = "/login?redirect=/funds"; return null; }
+  return r.json();
+}).then(u => {
+  if (!u) return;
+  const el = document.getElementById("sidebar-user");
+  function esc2(s) { const d = document.createElement("div"); d.textContent = s||""; return d.innerHTML; }
+  if (el) el.innerHTML = `<span style="font-weight:600">${esc2(u.name)}</span><br>
+    <span style="font-size:.72rem;color:#5E8FAD">${u.role.toUpperCase()}</span>`;
+  // Show add fund button only for admin
+  if (u.role === "admin") document.getElementById("add-fund-section").style.display = "block";
+}).catch(()=>{});
+
+loadFunds();
+</script>
+</body>
+</html>
