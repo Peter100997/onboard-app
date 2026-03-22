@@ -98,10 +98,10 @@
 
     .fund-card-footer { padding: 0.9rem 1.5rem; border-top: 1px solid var(--light);
                         display: flex; align-items: center; justify-content: space-between; }
-    .notion-link { display: inline-flex; align-items: center; gap: 5px; color: var(--slate);
+    .fund-meta-link { display: inline-flex; align-items: center; gap: 5px; color: var(--slate);
                    font-size: 0.78rem; text-decoration: none; padding: 4px 10px;
                    border: 1px solid var(--light); border-radius: 7px; transition: all .15s; }
-    .notion-link:hover { background: var(--light); color: var(--navy); }
+    .fund-meta-link:hover { background: var(--light); color: var(--navy); }
     .edit-btn { padding: 5px 14px; background: var(--teal); color: #fff; border: none;
                 border-radius: 7px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
     .edit-btn:hover { background: var(--teal-l); }
@@ -322,11 +322,7 @@ function fundCard(f) {
       </div>
     </div>
     <div class="fund-card-footer">
-      ${f.notionId
-        ? `<a class="notion-link" href="https://notion.so/${f.notionId.replace(/-/g,'')}" target="_blank">
-             Open in Notion ↗
-           </a>`
-        : `<span style="font-size:.75rem;color:#94A3B8">Not synced to Notion</span>`}
+      <span style="font-size:.75rem;color:#94A3B8">Min ticket: €${f.minTicket||500}k &nbsp;·&nbsp; Vintage ${f.vintage||"—"}</span>
       <button class="edit-btn" onclick="viewFundLPs('${esc(f.name)}')">View LPs →</button>
     </div>
   </div>`;

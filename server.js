@@ -1,5 +1,6 @@
 // ─── Onboard — LP Onboarding Platform ────────────────────────────────────────
 // Roles: admin | gp | lp
+// All data is stored locally. Notion & Claude are optional background services.
 // ─────────────────────────────────────────────────────────────────────────────
 require("dotenv").config();
 const express      = require("express");
@@ -9,21 +10,25 @@ const fs           = require("fs");
 const jwt          = require("jsonwebtoken");
 const bcrypt       = require("bcryptjs");
 const cookieParser = require("cookie-parser");
-const { Client }   = require("@notionhq/client");
-const Anthropic    = require("@anthropic-ai/sdk");
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "onboard-jwt-secret-2026";
 
-// ── Clients ───────────────────────────────────────────────────────────────────
-const notion = process.env.NOTION_TOKEN
-  ? new Client({ auth: process.env.NOTION_TOKEN })
-  : null;
+// ── Optional background services (app works fully without these) ───────────────
+let notion     = null;
+let anthropic  = null;
+let NotionClient, AnthropicSDK;
 
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  : null;
+try { NotionClient = require("@notionhq/client").Client; } catch {}
+try { AnthropicSDK = require("@anthropic-ai/sdk");       } catch {}
+
+if (process.env.NOTION_TOKEN && NotionClient) {
+  try { notion = new NotionClient({ auth: process.env.NOTION_TOKEN }); } catch {}
+}
+if (process.env.ANTHROPIC_API_KEY && AnthropicSDK) {
+  try { anthropic = new AnthropicSDK({ apiKey: process.env.ANTHROPIC_API_KEY }); } catch {}
+}
 
 // ── DB IDs ────────────────────────────────────────────────────────────────────
 const DB = {
@@ -665,15 +670,25 @@ app.put("/api/funds/:id", requireAuth("admin"), (req, res) => {
   writeFunds(funds); res.json({ ok: true });
 });
 
-// Health
+// Health — platform is always operational; notion/claude are optional extras
 app.get("/api/health", (req, res) =>
-  res.json({ status: "ok", notion: !!notion, claude: !!anthropic, funds: readFunds().length, lps: readQueue().length }));
+  res.json({
+    status:    "ok",
+    platform:  "standalone",
+    lps:       readQueue().length,
+    tasks:     readTasks().length,
+    funds:     readFunds().length,
+    users:     readUsers().length,
+    claude:    !!anthropic,
+    notionSync: !!notion,
+  }));
 
 // ── Start ──────────────────────────────────────────────────────────────────────
 seedAdmin();
 seedFunds();
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`\n✅ Onboard → http://localhost:${PORT}`);
-  console.log(`   Notion: ${notion ? "✅" : "⚠️  not configured"}`);
-  console.log(`   Claude: ${anthropic ? "✅" : "⚠️  add ANTHROPIC_API_KEY"}\n`);
+  console.log(`\n✅ Onboard is running → http://localhost:${PORT}`);
+  console.log(`   Data:   local JSON store (standalone — no external DB required)`);
+  console.log(`   Claude: ${anthropic ? "✅ AI review active" : "ℹ️  add ANTHROPIC_API_KEY for AI review"}`);
+  console.log(`   Notion: ${notion    ? "✅ background sync active" : "ℹ️  not configured (optional)"}\n`);
 });
