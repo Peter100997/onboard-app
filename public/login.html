@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard — Sign In</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0F1C2D;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2.5rem 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .logo-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;
+    }
+    .logo-mark {
+      width: 38px; height: 38px; background: #0D9488;
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-weight: 800; color: #fff; font-size: 16px;
+    }
+    .logo-name { font-size: 1.2rem; font-weight: 800; color: #1A2E44; letter-spacing: -0.3px; }
+    h1 { font-size: 1.4rem; font-weight: 700; color: #1A2E44; margin-bottom: 0.3rem; }
+    p.sub { font-size: 0.88rem; color: #64748B; margin-bottom: 1.8rem; }
+
+    label {
+      display: block;
+      font-size: 0.78rem; font-weight: 700; color: #1A2E44;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    input[type=email], input[type=password] {
+      width: 100%; padding: 0.75rem 1rem;
+      border: 2px solid #E2E8F0; border-radius: 10px;
+      font-size: 0.92rem; color: #1E293B; outline: none;
+      transition: border-color .2s;
+      margin-bottom: 1rem;
+    }
+    input[type=email]:focus, input[type=password]:focus { border-color: #0D9488; }
+
+    .btn {
+      width: 100%; padding: 0.8rem;
+      background: #0D9488; color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: #0F766E; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error {
+      background: #FEF2F2; color: #DC2626;
+      border-radius: 8px; padding: 0.7rem 0.9rem;
+      font-size: 0.85rem; margin-bottom: 1rem;
+      display: none;
+    }
+
+    .divider { text-align: center; margin: 1.5rem 0 0.5rem; font-size: 0.8rem; color: #94A3B8; }
+    .lp-link {
+      display: block; text-align: center;
+      font-size: 0.85rem; color: #0D9488;
+      text-decoration: none; margin-top: 0.5rem;
+      padding: 0.6rem;
+    }
+    .lp-link:hover { text-decoration: underline; }
+
+    .role-hint {
+      background: #F0FDFA; border: 1px solid #99F6E4;
+      border-radius: 8px; padding: 0.6rem 0.9rem;
+      font-size: 0.78rem; color: #0F766E;
+      margin-bottom: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="logo-mark">OB</div>
+    <span class="logo-name">Onboard</span>
+  </div>
+
+  <h1>Welcome back</h1>
+  <p class="sub">Sign in to access your Onboard workspace.</p>
+
+  <div class="error" id="error-msg"></div>
+
+  <form id="login-form">
+    <label for="email">Email address</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+
+    <button type="submit" class="btn" id="submit-btn">Sign in</button>
+  </form>
+
+  <div class="divider">Are you a new LP investor?</div>
+  <a href="/" class="lp-link">Start your LP onboarding application →</a>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect") || "/";
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("submit-btn");
+    const errEl = document.getElementById("error-msg");
+    btn.disabled = true;
+    btn.textContent = "Signing in…";
+    errEl.style.display = "none";
+
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email:    document.getElementById("email").value,
+          password: document.getElementById("password").value,
+          redirect,
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = data.role === "admin" ? "/admin"
+          : data.role === "gp" ? "/gp"
+          : data.redirect || "/status";
+      } else {
+        errEl.textContent = data.error || "Login failed";
+        errEl.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "Sign in";
+      }
+    } catch {
+      errEl.textContent = "Network error. Please try again.";
+      errEl.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Sign in";
+    }
+  });
+</script>
+</body>
+</html>

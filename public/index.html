@@ -59,15 +59,16 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
   .form-row.single { grid-template-columns: 1fr; }
   .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-  label { font-size: 0.8rem; font-weight: 600; color: var(--navy); text-transform: uppercase;
-          letter-spacing: 0.04em; }
-  label .req { color: var(--teal); }
-  input, select, textarea {
+  label.field-label { font-size: 0.8rem; font-weight: 600; color: var(--navy); text-transform: uppercase;
+          letter-spacing: 0.04em; display: block; }
+  label.field-label .req { color: var(--teal); }
+  input[type=text], input[type=email], input[type=number], select, textarea {
     border: 1.5px solid var(--lgrey); border-radius: 8px; padding: 0.65rem 0.9rem;
     font-size: 0.9rem; color: var(--slate); background: #fff; outline: none;
     transition: border-color .2s, box-shadow .2s; width: 100%;
   }
-  input:focus, select:focus, textarea:focus {
+  input[type=text]:focus, input[type=email]:focus, input[type=number]:focus,
+  select:focus, textarea:focus {
     border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
   }
   textarea { resize: vertical; min-height: 80px; }
@@ -76,25 +77,43 @@
   /* ── Checkbox group ── */
   .checkbox-group { display: flex; flex-direction: column; gap: 0.7rem; margin: 0.5rem 0; }
   .checkbox-item { display: flex; align-items: flex-start; gap: 0.7rem; cursor: pointer; }
-  .checkbox-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--teal);
-                                         flex-shrink: 0; margin-top: 1px; }
+  .checkbox-item input[type=checkbox] {
+    width: 18px; height: 18px; min-width: 18px; accent-color: var(--teal);
+    flex-shrink: 0; margin-top: 1px; cursor: pointer;
+  }
   .checkbox-text { font-size: 0.875rem; color: var(--slate); line-height: 1.4; }
   .checkbox-text strong { color: var(--navy); }
 
   /* ── Radio group ── */
   .radio-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.3rem; }
-  .radio-item { display: flex; align-items: center; gap: 0.6rem; cursor: pointer;
-                padding: 0.6rem 0.8rem; border: 1.5px solid var(--lgrey); border-radius: 8px;
-                transition: all .2s; }
+  .radio-item {
+    display: flex; align-items: center; gap: 0.75rem; cursor: pointer;
+    padding: 0.65rem 0.9rem; border: 1.5px solid var(--lgrey); border-radius: 8px;
+    transition: all .2s;
+  }
   .radio-item:hover { border-color: var(--teal); background: var(--teal-light); }
-  .radio-item input[type=radio] { accent-color: var(--teal); flex-shrink: 0; }
-  .radio-item .radio-label { font-size: 0.875rem; color: var(--slate); font-weight: 500; }
+  .radio-item input[type=radio] {
+    width: 17px; height: 17px; min-width: 17px; flex-shrink: 0;
+    accent-color: var(--teal); cursor: pointer;
+  }
+  .radio-item .radio-label { font-size: 0.875rem; color: var(--slate); font-weight: 500; line-height: 1.3; }
   .radio-item.selected { border-color: var(--teal); background: var(--teal-light); }
 
   /* ── Info box ── */
   .info-box { background: #F0FDFA; border: 1px solid var(--teal); border-radius: 8px;
               padding: 0.8rem 1rem; margin-bottom: 1.5rem; font-size: 0.83rem; color: #0F766E; }
   .info-box strong { display: block; margin-bottom: 0.2rem; }
+
+  /* Jurisdiction badge */
+  .jurisdiction-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+    margin-left: 0.5rem; vertical-align: middle;
+  }
+  .jur-eu  { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+  .jur-uk  { background: #FDF4FF; color: #6B21A8; border: 1px solid #E9D5FF; }
+  .jur-ch  { background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; }
+  .jur-int { background: #F0FDF4; color: #14532D; border: 1px solid #BBF7D0; }
 
   /* ── Divider ── */
   .divider { height: 1px; background: var(--lgrey); margin: 1.5rem 0; }
@@ -207,27 +226,48 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>Full Legal Name <span class="req">*</span></label>
+          <label class="field-label">Full Legal Name <span class="req">*</span></label>
           <input type="text" id="lpName" placeholder="e.g. Johann Schmidt" required>
         </div>
         <div class="form-group">
-          <label>Email Address <span class="req">*</span></label>
+          <label class="field-label">Email Address <span class="req">*</span></label>
           <input type="email" id="email" placeholder="your@email.com" required>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Nationality <span class="req">*</span></label>
-          <select id="nationality">
+          <label class="field-label">Nationality / Country of Domicile <span class="req">*</span></label>
+          <select id="nationality" onchange="onNationalityChange()">
             <option value="">Select country…</option>
-            <option>Switzerland</option><option>Germany</option><option>Austria</option>
-            <option>Luxembourg</option><option>France</option><option>United Kingdom</option>
-            <option>Netherlands</option><option>United States</option><option>Singapore</option>
-            <option>United Arab Emirates</option><option>Other</option>
+            <optgroup label="Switzerland">
+              <option value="CH">Switzerland</option>
+            </optgroup>
+            <optgroup label="United Kingdom">
+              <option value="UK">United Kingdom</option>
+            </optgroup>
+            <optgroup label="European Union / Luxembourg">
+              <option value="EU">Germany</option>
+              <option value="EU">Austria</option>
+              <option value="EU">Luxembourg</option>
+              <option value="EU">France</option>
+              <option value="EU">Netherlands</option>
+              <option value="EU">Italy</option>
+              <option value="EU">Spain</option>
+              <option value="EU">Belgium</option>
+              <option value="EU">Sweden</option>
+              <option value="EU">Denmark</option>
+            </optgroup>
+            <optgroup label="Other / International">
+              <option value="INT">United States</option>
+              <option value="INT">Singapore</option>
+              <option value="INT">United Arab Emirates</option>
+              <option value="INT">Other</option>
+            </optgroup>
           </select>
+          <span class="hint" id="jur-hint"></span>
         </div>
         <div class="form-group">
-          <label>Investor Type <span class="req">*</span></label>
+          <label class="field-label">Investor Type <span class="req">*</span></label>
           <select id="investorType">
             <option value="">Select type…</option>
             <option>Individual HNWI</option>
@@ -252,13 +292,13 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>Committed Amount <span class="req">*</span></label>
+          <label class="field-label">Committed Amount <span class="req">*</span></label>
           <input type="number" id="committedAmount" placeholder="500" min="500">
           <span class="hint">Minimum €500k · Amount in thousands EUR</span>
         </div>
         <div class="form-group">
-          <label>Currency</label>
-          <select>
+          <label class="field-label">Currency</label>
+          <select id="currency">
             <option>EUR</option><option>CHF</option><option>USD</option><option>GBP</option>
           </select>
         </div>
@@ -266,7 +306,7 @@
 
       <div class="form-row single">
         <div class="form-group">
-          <label>Primary Source of Wealth <span class="req">*</span></label>
+          <label class="field-label">Primary Source of Wealth <span class="req">*</span></label>
           <select id="sourceOfWealth">
             <option value="">Select source…</option>
             <option>Business / Entrepreneurship</option>
@@ -282,7 +322,7 @@
 
       <div class="form-row single">
         <div class="form-group">
-          <label>Additional Notes</label>
+          <label class="field-label">Additional Notes</label>
           <textarea id="notes" placeholder="Any additional context about your investment or background (optional)…"></textarea>
         </div>
       </div>
@@ -296,22 +336,22 @@
     <!-- ── Step 3: Compliance ── -->
     <div class="form-step" id="step3">
       <div class="card-title">Compliance Declarations</div>
-      <div class="card-subtitle">These declarations are required under AIFMD and GDPR for all LP investors in European alternative funds.</div>
+      <div class="card-subtitle">These declarations are required under applicable fund regulations and AML/KYC obligations for all LP investors.</div>
 
       <div class="info-box">
         <strong>⚖️ Why we ask this</strong>
-        Felten Capital Fund I is regulated under AIFMD and subject to AML/KYC requirements. These disclosures allow our compliance team to complete your onboarding efficiently.
+        Felten Capital Fund I is subject to AIFMD, GDPR, and applicable local regulations. These disclosures allow our compliance team to complete your onboarding efficiently and meet all regulatory requirements.
       </div>
 
       <div class="form-group" style="margin-bottom:1.2rem">
-        <label>Politically Exposed Person (PEP) Status <span class="req">*</span></label>
-        <div class="hint" style="margin-bottom:0.5rem">A PEP is a person who holds (or has held within the last 12 months) a prominent public function, or is a family member or close associate of such a person.</div>
+        <label class="field-label">Politically Exposed Person (PEP) Status <span class="req">*</span></label>
+        <div class="hint" style="margin-bottom:0.6rem">A PEP is a person who holds (or has held within the last 12 months) a prominent public function, or is a family member or close associate of such a person.</div>
         <div class="radio-group" id="pepGroup">
-          <label class="radio-item" onclick="selectRadio(this,'pepStatus','No')">
+          <label class="radio-item" id="pep-no" onclick="selectRadio('No')">
             <input type="radio" name="pepStatus" value="No"> <span class="radio-label">I am <strong>not</strong> a Politically Exposed Person</span>
           </label>
-          <label class="radio-item" onclick="selectRadio(this,'pepStatus','Yes')">
-            <input type="radio" name="pepStatus" value="Yes"> <span class="radio-label">I am (or have been within 12 months) a Politically Exposed Person</span>
+          <label class="radio-item" id="pep-yes" onclick="selectRadio('Yes')">
+            <input type="radio" name="pepStatus" value="Yes"> <span class="radio-label">I am (or have been within 12 months) a Politically Exposed Person — enhanced due diligence will apply</span>
           </label>
         </div>
       </div>
@@ -319,11 +359,11 @@
       <div class="divider"></div>
 
       <div class="form-group">
-        <label>Sanctions Confirmation <span class="req">*</span></label>
+        <label class="field-label">Sanctions Confirmation <span class="req">*</span></label>
         <div class="checkbox-group">
           <label class="checkbox-item">
             <input type="checkbox" id="sanctionsConfirm">
-            <span class="checkbox-text">I confirm that I am not subject to any EU, US, UN, or Swiss sanctions, and I am not acting on behalf of any sanctioned individual or entity.</span>
+            <span class="checkbox-text">I confirm that I am not subject to any EU, US, UN, UK, or Swiss sanctions, and I am not acting on behalf of any sanctioned individual or entity.</span>
           </label>
         </div>
       </div>
@@ -331,11 +371,11 @@
       <div class="divider"></div>
 
       <div class="form-group">
-        <label>GDPR Consent <span class="req">*</span></label>
+        <label class="field-label">GDPR / Data Processing Consent <span class="req">*</span></label>
         <div class="checkbox-group">
           <label class="checkbox-item">
             <input type="checkbox" id="gdprConsent">
-            <span class="checkbox-text">I consent to the processing of my personal data by Felten Capital and Onboard for the purposes of investor onboarding, KYC/AML compliance, and fund administration, in accordance with GDPR.</span>
+            <span class="checkbox-text">I consent to the processing of my personal data by Felten Capital and Onboard for the purposes of investor onboarding, KYC/AML compliance, and fund administration, in accordance with GDPR and applicable data protection law.</span>
           </label>
         </div>
       </div>
@@ -349,40 +389,25 @@
     <!-- ── Step 4: Documents ── -->
     <div class="form-step" id="step4">
       <div class="card-title">Document Checklist</div>
-      <div class="card-subtitle">Please confirm which documents you are prepared to provide. Physical documents will be collected by our legal team within 24 hours.</div>
+      <div class="card-subtitle">Required documents are determined by your jurisdiction. Please confirm availability — our legal team will follow up within 24 hours.</div>
 
-      <div class="info-box">
-        <strong>📄 Required Documents</strong>
-        Please confirm availability. Our team will follow up by secure email with upload instructions.
+      <div class="info-box" id="jur-doc-info">
+        <strong id="jur-doc-title">📄 Required Documents</strong>
+        <span id="jur-doc-desc">Please confirm availability. Our team will follow up by secure email with upload instructions.</span>
       </div>
 
-      <div class="checkbox-group" style="margin-bottom:1.5rem">
-        <label class="checkbox-item">
-          <input type="checkbox" id="kycDocs">
-          <span class="checkbox-text"><strong>KYC Identity Documents</strong> — Valid passport or national ID card (both sides)</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="subDocSigned">
-          <span class="checkbox-text"><strong>Subscription Agreement</strong> — I have reviewed and am prepared to sign the fund subscription documents</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="sowDocs">
-          <span class="checkbox-text"><strong>Source of Wealth Evidence</strong> — Bank statements, company accounts, or other documentary evidence</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="taxDocs">
-          <span class="checkbox-text"><strong>Tax Residency Certificate</strong> — FATCA/CRS self-certification (provided by our team)</span>
-        </label>
+      <div class="checkbox-group" id="doc-checklist" style="margin-bottom:1.5rem">
+        <!-- Populated dynamically by renderDocuments() -->
       </div>
 
       <div class="form-group">
-        <label>Upload Documents (Optional)</label>
+        <label class="field-label">Upload Documents (Optional)</label>
         <div style="border: 2px dashed var(--lgrey); border-radius: 8px; padding: 1.5rem;
                     text-align: center; color: #94A3B8; font-size: 0.875rem;">
-          📎 Drag & drop files here, or <span style="color:var(--teal);cursor:pointer">browse</span><br>
+          📎 Drag &amp; drop files here, or <span style="color:var(--teal);cursor:pointer">browse</span><br>
           <span style="font-size:0.75rem">PDF, JPG, PNG · Max 10MB per file</span>
         </div>
-        <span class="hint">For the pilot, document upload is optional. Our team will reach out separately.</span>
+        <span class="hint">Document upload is optional at this stage. Our team will reach out separately with secure upload instructions.</span>
       </div>
 
       <div class="btn-row">
@@ -460,9 +485,120 @@
 <script>
 let currentStep = 1;
 const totalSteps = 5;
-let selectedPep = "No";
-let submissionResult = null;
+let selectedPep = null;
+let detectedJurisdiction = "INT"; // default
 
+// ── Jurisdiction config ──────────────────────────────────────────────────────
+const JURISDICTIONS = {
+  EU: {
+    label: "EU / AIFMD / Luxembourg (CSSF)",
+    badge: "jur-eu",
+    infoTitle: "📄 EU/AIFMD Required Documents (Luxembourg CSSF)",
+    infoDesc: "As an EU-domiciled investor, documents are required under AIFMD Art. 23, Luxembourg CSSF regulation, and EU AML/KYC Directive.",
+    docs: [
+      { id: "doc_passport",    label: "Passport or National ID Card", desc: "Certified copy of valid passport or EU national ID (both sides). Must be notarised for investments above €5M." },
+      { id: "doc_address",     label: "Proof of Address", desc: "Recent utility bill or bank statement (≤ 3 months old) confirming residential address." },
+      { id: "doc_subscription",label: "Signed Subscription Agreement", desc: "I have reviewed and am prepared to sign the fund subscription documents including side letters where applicable." },
+      { id: "doc_sow",         label: "Source of Wealth Declaration", desc: "Signed declaration and documentary evidence of the origin of invested funds (AIFMD Art. 23 requirement)." },
+      { id: "doc_fatca",       label: "FATCA/CRS Self-Certification", desc: "Tax residency and FATCA/CRS self-certification form (provided by our team upon request)." },
+      { id: "doc_suitability", label: "AIFMD Investor Suitability Assessment", desc: "Suitability questionnaire per AIFMD Art. 9 confirming professional or elective professional investor status." },
+      { id: "doc_cssf",        label: "CSSF Suitability Questionnaire", desc: "Luxembourg CSSF-specific investor classification and suitability assessment (applicable for Luxembourg-domiciled investors)." },
+      { id: "doc_lei",         label: "LEI Number (Institutional Only)", desc: "Legal Entity Identifier for corporate, institutional, or fund-of-funds investors. Required under EMIR and AIFMD reporting." },
+    ]
+  },
+  UK: {
+    label: "United Kingdom (FCA)",
+    badge: "jur-uk",
+    infoTitle: "📄 UK FCA Required Documents",
+    infoDesc: "As a UK-domiciled investor, documents are required under FCA COBS rules, the Financial Services and Markets Act 2000 (FSMA), and UK AML regulations.",
+    docs: [
+      { id: "doc_passport",    label: "Passport or UK National ID", desc: "Certified copy of valid UK or foreign passport. UK biometric residence permit accepted for non-UK nationals." },
+      { id: "doc_address",     label: "Proof of Address", desc: "Recent utility bill, council tax statement, or bank statement (≤ 3 months) confirming UK residential address." },
+      { id: "doc_subscription",label: "Signed Subscription Agreement", desc: "I have reviewed and am prepared to sign the fund subscription documents including any UK-specific schedules." },
+      { id: "doc_sow",         label: "Source of Wealth Declaration", desc: "Signed declaration and documentary evidence of the origin of invested funds per FCA SYSC and AML rules." },
+      { id: "doc_fca_cat",     label: "FCA Investor Categorisation Form", desc: "Classification as a Professional Client or Elective Professional Client per FCA COBS 3 rules. Required for all UK investors." },
+      { id: "doc_fp_ack",      label: "Financial Promotion Acknowledgment", desc: "Acknowledgment confirming receipt and understanding of financial promotions per FSMA s.21 and FCA COBS 4." },
+      { id: "doc_cass",        label: "CASS Client Money Acknowledgment", desc: "Confirmation of client money and asset protection status under FCA Client Assets (CASS) rules." },
+      { id: "doc_fatca",       label: "FATCA/CRS Self-Certification", desc: "UK HMRC-compliant tax residency and FATCA/CRS self-certification form." },
+    ]
+  },
+  CH: {
+    label: "Switzerland (FINMA / FIDLEG / CISA)",
+    badge: "jur-ch",
+    infoTitle: "📄 Swiss FINMA / FIDLEG Required Documents",
+    infoDesc: "As a Swiss-domiciled investor, documents are required under FinSA (FIDLEG), CISA Art. 10, AMLA (GwG), and FINMA circular regulations.",
+    docs: [
+      { id: "doc_passport",    label: "Swiss ID Card or Passport", desc: "Valid Swiss national identity card or passport. Foreign nationals: valid foreign passport plus Swiss residence permit (B/C/L)." },
+      { id: "doc_address",     label: "Proof of Address", desc: "Recent utility bill, cantonal tax statement, or bank statement (≤ 3 months) confirming Swiss residential address." },
+      { id: "doc_subscription",label: "Signed Subscription Agreement", desc: "I have reviewed and am prepared to sign the fund subscription documents including Swiss-specific provisions." },
+      { id: "doc_sow",         label: "Source of Wealth Declaration", desc: "Signed declaration and documentary evidence per AMLA (Geldwäschereigesetz) Art. 3 and FINMA due diligence requirements." },
+      { id: "doc_fidleg",      label: "FIDLEG Suitability Assessment", desc: "Suitability and appropriateness assessment per FinSA (FIDLEG) Art. 10 and 11. Required for all Swiss clients of financial service providers." },
+      { id: "doc_bo",          label: "Beneficial Ownership Declaration (BO Form)", desc: "Identification of beneficial owner per AMLA Art. 4 (GwG Form A or equivalent). Mandatory for Swiss AML compliance." },
+      { id: "doc_qia",         label: "Qualified Investor Declaration (CISA Art. 10)", desc: "Declaration confirming status as a qualified investor under CISA Art. 10(3)(b) or (c) for access to non-public Swiss funds." },
+      { id: "doc_fatca",       label: "FATCA/CRS Self-Certification", desc: "Swiss ESTV-compliant tax residency and FATCA/CRS self-certification (AEOI declaration)." },
+    ]
+  },
+  INT: {
+    label: "International",
+    badge: "jur-int",
+    infoTitle: "📄 International Investor Required Documents",
+    infoDesc: "As an international investor, standard KYC/AML documentation is required. Additional jurisdiction-specific documents may be requested.",
+    docs: [
+      { id: "doc_passport",    label: "Valid Passport", desc: "Certified copy of valid international passport. Documents must be in English or accompanied by a certified translation." },
+      { id: "doc_address",     label: "Proof of Address", desc: "Recent utility bill or bank statement (≤ 3 months) confirming residential or registered business address." },
+      { id: "doc_subscription",label: "Signed Subscription Agreement", desc: "I have reviewed and am prepared to sign the fund subscription documents." },
+      { id: "doc_sow",         label: "Source of Wealth Declaration", desc: "Signed declaration and documentary evidence of the origin of the invested funds." },
+      { id: "doc_aml",         label: "AML/KYC Questionnaire", desc: "Completed Anti-Money Laundering and Know Your Customer questionnaire (provided by our team)." },
+      { id: "doc_fatca",       label: "FATCA/CRS Self-Certification", desc: "Tax residency self-certification (W-8BEN for non-US persons; W-9 for US persons)." },
+      { id: "doc_bank_ref",    label: "Bank Reference Letter", desc: "Confirmation letter from a reputable financial institution confirming banking relationship and good standing (≤ 12 months old)." },
+    ]
+  }
+};
+
+const NATIONALITY_MAP = {
+  "CH": "CH",
+  "UK": "UK",
+  "EU": "EU",
+  "INT": "INT"
+};
+
+function getJurisdiction() {
+  const sel = document.getElementById("nationality");
+  const val = sel?.value;
+  return NATIONALITY_MAP[val] || "INT";
+}
+
+function onNationalityChange() {
+  const jur = getJurisdiction();
+  detectedJurisdiction = jur;
+  const cfg = JURISDICTIONS[jur];
+  const hint = document.getElementById("jur-hint");
+  if (hint && cfg) {
+    hint.innerHTML = `Jurisdiction detected: <strong style="color:#0F766E">${cfg.label}</strong>`;
+  }
+  // Re-render docs if already on step 4
+  if (currentStep === 4) renderDocuments();
+}
+
+function renderDocuments() {
+  const jur = getJurisdiction();
+  const cfg = JURISDICTIONS[jur] || JURISDICTIONS["INT"];
+
+  // Update info box
+  document.getElementById("jur-doc-title").textContent = cfg.infoTitle;
+  document.getElementById("jur-doc-desc").textContent = cfg.infoDesc;
+
+  // Render checklist
+  const list = document.getElementById("doc-checklist");
+  list.innerHTML = cfg.docs.map(d => `
+    <label class="checkbox-item">
+      <input type="checkbox" id="${d.id}">
+      <span class="checkbox-text"><strong>${d.label}</strong> — ${d.desc}</span>
+    </label>
+  `).join("");
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
 function goTo(step) {
   if (step < 1 || step > totalSteps) return;
   if (!validateStep(currentStep)) return;
@@ -476,6 +612,8 @@ function goTo(step) {
   document.getElementById('step' + currentStep).classList.add('active');
   document.getElementById('sc' + currentStep).classList.add('active');
   document.getElementById('sl' + currentStep).classList.add('active');
+
+  if (step === 4) renderDocuments();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -483,7 +621,7 @@ function validateStep(step) {
   if (step === 1) {
     if (!document.getElementById('lpName').value.trim()) { alert('Please enter your full legal name.'); return false; }
     if (!document.getElementById('email').value.trim()) { alert('Please enter your email address.'); return false; }
-    if (!document.getElementById('nationality').value) { alert('Please select your nationality.'); return false; }
+    if (!document.getElementById('nationality').value) { alert('Please select your nationality / country of domicile.'); return false; }
     if (!document.getElementById('investorType').value) { alert('Please select your investor type.'); return false; }
   }
   if (step === 2) {
@@ -493,28 +631,40 @@ function validateStep(step) {
   if (step === 3) {
     if (!document.querySelector('input[name="pepStatus"]:checked')) { alert('Please complete the PEP declaration.'); return false; }
     if (!document.getElementById('sanctionsConfirm').checked) { alert('Please confirm the sanctions declaration.'); return false; }
-    if (!document.getElementById('gdprConsent').checked) { alert('Please confirm your GDPR consent.'); return false; }
+    if (!document.getElementById('gdprConsent').checked) { alert('Please confirm your GDPR / data processing consent.'); return false; }
   }
   return true;
 }
 
-function selectRadio(el, name, value) {
-  document.querySelectorAll(`#pepGroup .radio-item`).forEach(r => r.classList.remove('selected'));
-  el.classList.add('selected');
+function selectRadio(value) {
+  document.querySelectorAll('#pepGroup .radio-item').forEach(r => r.classList.remove('selected'));
+  const target = value === 'No' ? document.getElementById('pep-no') : document.getElementById('pep-yes');
+  if (target) target.classList.add('selected');
+  // Programmatically check the radio
+  const radios = document.querySelectorAll('input[name="pepStatus"]');
+  radios.forEach(r => { r.checked = (r.value === value); });
   selectedPep = value;
 }
 
+// ── Review ────────────────────────────────────────────────────────────────────
 function buildReview() {
+  const jur = getJurisdiction();
+  const cfg = JURISDICTIONS[jur] || JURISDICTIONS["INT"];
+  const checkedDocs = cfg.docs.filter(d => {
+    const el = document.getElementById(d.id);
+    return el && el.checked;
+  });
+
   const items = [
     ['Full Name',      document.getElementById('lpName').value],
     ['Email',          document.getElementById('email').value],
-    ['Nationality',    document.getElementById('nationality').value],
+    ['Nationality',    document.getElementById('nationality').options[document.getElementById('nationality').selectedIndex]?.text || '—'],
+    ['Jurisdiction',   cfg.label],
     ['Investor Type',  document.getElementById('investorType').value],
     ['Commitment',     '€' + document.getElementById('committedAmount').value + 'k'],
     ['Source of Wealth', document.getElementById('sourceOfWealth').value],
-    ['PEP Status',     selectedPep === 'No' ? 'Not a PEP' : 'PEP — will require enhanced due diligence'],
-    ['KYC Docs',       document.getElementById('kycDocs').checked ? '✓ Confirmed' : '⚠ Not confirmed'],
-    ['Sub Doc',        document.getElementById('subDocSigned').checked ? '✓ Ready to sign' : '⚠ Not confirmed'],
+    ['PEP Status',     selectedPep === 'No' ? 'Not a PEP' : 'PEP — enhanced due diligence required'],
+    ['Documents Ready', checkedDocs.length + ' / ' + cfg.docs.length + ' confirmed'],
     ['Fund',           'Felten Capital Fund I'],
   ];
   const grid = document.getElementById('reviewGrid');
@@ -525,28 +675,33 @@ function buildReview() {
     </div>`).join('');
 }
 
+// ── Submit ────────────────────────────────────────────────────────────────────
 async function submitForm() {
   document.getElementById('loading').classList.add('visible');
   document.getElementById('submitBtn').disabled = true;
 
+  const jur = getJurisdiction();
+  const natSelect = document.getElementById('nationality');
+  const natText = natSelect.options[natSelect.selectedIndex]?.text || '';
+
   const body = new URLSearchParams({
     lpName:           document.getElementById('lpName').value,
     email:            document.getElementById('email').value,
-    nationality:      document.getElementById('nationality').value,
+    nationality:      natText,
+    jurisdiction:     jur,
     investorType:     document.getElementById('investorType').value,
     committedAmount:  document.getElementById('committedAmount').value,
     sourceOfWealth:   document.getElementById('sourceOfWealth').value,
-    pepStatus:        selectedPep,
+    pepStatus:        selectedPep || 'No',
     notes:            document.getElementById('notes').value,
-    kycDocs:          document.getElementById('kycDocs').checked,
-    subDocSigned:     document.getElementById('subDocSigned').checked,
+    kycDocs:          !!document.getElementById('doc_passport')?.checked,
+    subDocSigned:     !!document.getElementById('doc_subscription')?.checked,
     fund:             'Felten Capital Fund I',
   });
 
   try {
     const res = await fetch('/submit', { method: 'POST', body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
     const data = await res.json();
-    submissionResult = data;
     showSuccess(data);
   } catch (e) {
     alert('Submission error: ' + e.message);
@@ -576,10 +731,12 @@ function showSuccess(data) {
     data.recommendation === 'Reject'  ? 'status-flagged'  : 'status-review'
   );
 
-  // hide progress
   document.querySelector('.progress-wrap').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Init documents on load (default = INT)
+renderDocuments();
 </script>
 </body>
 </html>

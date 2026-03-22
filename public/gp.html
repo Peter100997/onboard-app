@@ -308,6 +308,7 @@
     </a>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-footer">
+      <div id="sidebar-user" style="color:#94A3B8;margin-bottom:6px;">Loading…</div>
       <div class="sidebar-fund">Felten Capital Fund I</div>
       <div style="margin-top:3px;">PE · Switzerland · AIFMD</div>
     </div>
@@ -321,6 +322,9 @@
         <span class="last-updated" id="last-updated">Refreshing…</span>
         <button class="refresh-btn" onclick="loadDashboard()">
           ↻ Refresh
+        </button>
+        <button class="refresh-btn" style="background:transparent;border:1.5px solid var(--light);color:var(--slate);" onclick="logout()">
+          Sign out
         </button>
       </div>
     </div>
@@ -457,6 +461,7 @@
 
     try {
       const dashRes = await fetch("/api/dashboard");
+      if (dashRes.status === 401) { window.location.href = "/login?redirect=/gp"; return; }
       const dash = await dashRes.json();
 
       // All LPs: use recentSubmissions for now (server returns last 5)
@@ -597,6 +602,24 @@
     d.textContent = str || "—";
     return d.innerHTML;
   }
+
+  async function logout() {
+    await fetch("/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  }
+
+  // Load current user info
+  fetch("/auth/me").then(r => {
+    if (r.status === 401) { window.location.href = "/login?redirect=/gp"; return null; }
+    return r.json();
+  }).then(u => {
+    if (!u) return;
+    const el = document.getElementById("sidebar-user");
+    if (el) {
+      el.innerHTML = `<span style="font-weight:600">${esc(u.name)}</span><br>
+        <span style="font-size:0.72rem;color:#5E8FAD">${u.role.toUpperCase()}</span>`;
+    }
+  }).catch(() => {});
 
   // Auto-refresh every 30s
   loadDashboard();

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard — Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1A2E44; --teal: #0D9488; --teal-l: #14B8A8;
+      --off-w: #F8FAFC; --slate: #64748B; --light: #E2E8F0;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--off-w); color: #1E293B; min-height: 100vh; }
+
+    /* Layout */
+    .layout { display: flex; min-height: 100vh; }
+    aside {
+      width: 220px; background: var(--navy); flex-shrink: 0;
+      display: flex; flex-direction: column; padding-top: 0;
+    }
+    .sidebar-logo { padding: 1.4rem 1.5rem 1rem; display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08); }
+    .logo-mark { width: 34px; height: 34px; background: var(--teal); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff; font-size: 15px; }
+    .sidebar-logo span { color: #fff; font-weight: 700; font-size: 1rem; }
+    .nav-section { padding: 1rem 1rem 0.4rem;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: #5E8FAD; }
+    .nav-item { display: flex; align-items: center; gap: 10px;
+      padding: 9px 1.5rem; font-size: 0.87rem; color: #94A3B8;
+      cursor: pointer; text-decoration: none; transition: all .2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .nav-item.active { color: #fff; background: rgba(13,148,136,.2);
+      border-right: 3px solid var(--teal); }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.08);
+      font-size: 0.78rem; color: #5E8FAD; }
+
+    main { flex: 1; overflow-y: auto; }
+    .topbar { background: #fff; border-bottom: 1px solid var(--light);
+      padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .topbar h1 { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
+    .logout-btn { padding: 6px 14px; background: transparent; border: 1.5px solid var(--light);
+      border-radius: 8px; font-size: 0.82rem; color: var(--slate); cursor: pointer; }
+    .logout-btn:hover { background: var(--light); }
+
+    .content { padding: 1.8rem 2rem; }
+
+    /* Role badges */
+    .role-badge { display: inline-block; padding: 3px 9px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px; }
+    .role-admin { background: #FEF3C7; color: #92400E; }
+    .role-gp    { background: #EDE9FE; color: #5B21B6; }
+    .role-lp    { background: #ECFDF5; color: #065F46; }
+
+    /* Cards */
+    .section-card { background: #fff; border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 1.5rem; }
+    .section-head { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--light);
+      display: flex; align-items: center; justify-content: space-between; }
+    .section-head h2 { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th { padding: 9px 1.5rem;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--slate); background: var(--off-w); text-align: left; }
+    tbody tr { border-bottom: 1px solid var(--light); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 1.5rem; font-size: 0.87rem; }
+
+    /* Form */
+    .add-user-form { padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 0.8rem; align-items: end; }
+    .form-field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-field label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--slate); }
+    .form-field input, .form-field select {
+      padding: 0.6rem 0.8rem; border: 1.5px solid var(--light); border-radius: 8px;
+      font-size: 0.87rem; outline: none; color: #1E293B; width: 100%;
+    }
+    .form-field input:focus, .form-field select:focus { border-color: var(--teal); }
+
+    .btn-add { padding: 0.6rem 1.2rem; background: var(--teal); color: #fff;
+      border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; white-space: nowrap; height: 38px; }
+    .btn-add:hover { background: var(--teal-l); }
+
+    .btn-del { padding: 4px 10px; background: #FEF2F2; color: #DC2626;
+      border: 1px solid #FECACA; border-radius: 6px; font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; }
+    .btn-del:hover { background: #FCA5A5; }
+
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--navy); color: #fff; padding: 0.8rem 1.4rem;
+      border-radius: 10px; font-size: 0.88rem; font-weight: 600;
+      opacity: 0; transform: translateY(8px); transition: all .3s; pointer-events: none; z-index: 999; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media(max-width:900px) { aside { display: none; } .add-user-form { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-logo">
+      <div class="logo-mark">OB</div>
+      <span>Onboard</span>
+    </div>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item active" href="/admin">👥 User Management</a>
+    <a class="nav-item" href="/gp">📊 GP Dashboard</a>
+    <a class="nav-item" href="/" target="_blank">📝 LP Form</a>
+    <div class="nav-section" style="margin-top:1rem">Notion DBs</div>
+    <a class="nav-item" href="https://www.notion.so/3f253f1689b74b58a5344ccd76600b49" target="_blank">👤 LP Pipeline</a>
+    <a class="nav-item" href="https://www.notion.so/928b845946e649758dcb57ce4c1e16bc" target="_blank">✅ Compliance Tasks</a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer" id="user-info">Loading…</div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <h1>User Management</h1>
+      <button class="logout-btn" onclick="logout()">Sign out</button>
+    </div>
+
+    <div class="content">
+
+      <!-- Add user form -->
+      <div class="section-card">
+        <div class="section-head"><h2>Add User</h2></div>
+        <form class="add-user-form" id="add-form">
+          <div class="form-field">
+            <label>Full Name</label>
+            <input id="new-name" type="text" placeholder="Anna Müller" required />
+          </div>
+          <div class="form-field">
+            <label>Email</label>
+            <input id="new-email" type="email" placeholder="anna@fund.com" required />
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <select id="new-role">
+              <option value="gp">GP (Fund Manager)</option>
+              <option value="lp">LP (Investor)</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Temp Password</label>
+            <input id="new-pwd" type="text" placeholder="TempPass123!" required />
+          </div>
+          <button type="submit" class="btn-add">Add User</button>
+        </form>
+      </div>
+
+      <!-- Users table -->
+      <div class="section-card">
+        <div class="section-head">
+          <h2>All Users</h2>
+          <span id="user-count" style="font-size:0.8rem;color:var(--slate)"></span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--slate)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
+  function roleBadge(role) {
+    return `<span class="role-badge role-${role}">${role.toUpperCase()}</span>`;
+  }
+
+  async function loadUsers() {
+    const res = await fetch("/api/users");
+    if (!res.ok) return;
+    const users = await res.json();
+    document.getElementById("user-count").textContent = users.length + " users";
+    document.getElementById("users-tbody").innerHTML = users.map(u => `
+      <tr>
+        <td style="font-weight:600;color:#1A2E44">${esc(u.name)}</td>
+        <td style="color:var(--slate)">${esc(u.email)}</td>
+        <td>${roleBadge(u.role)}</td>
+        <td style="color:var(--slate);font-size:0.8rem">${u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-GB") : "—"}</td>
+        <td>${u.id !== "user-admin-001"
+          ? `<button class="btn-del" onclick="deleteUser('${u.id}','${esc(u.name)}')">Remove</button>`
+          : `<span style="font-size:0.75rem;color:var(--slate)">Primary admin</span>`
+        }</td>
+      </tr>
+    `).join("");
+  }
+
+  async function deleteUser(id, name) {
+    if (!confirm(`Remove user "${name}"?`)) return;
+    const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+    if (res.ok) { showToast("User removed"); loadUsers(); }
+    else showToast("Error removing user");
+  }
+
+  document.getElementById("add-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      name:     document.getElementById("new-name").value,
+      email:    document.getElementById("new-email").value,
+      role:     document.getElementById("new-role").value,
+      password: document.getElementById("new-pwd").value,
+    };
+    const res = await fetch("/api/users", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (res.ok) {
+      showToast(`User ${body.name} added as ${body.role}`);
+      e.target.reset();
+      loadUsers();
+    } else {
+      const d = await res.json();
+      showToast("Error: " + (d.error || "Failed"));
+    }
+  });
+
+  async function logout() {
+    await fetch("/auth/logout", { method: "POST" });
+    window.location.href = "/login";
+  }
+
+  function esc(s) {
+    const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML;
+  }
+
+  // Load current user
+  fetch("/auth/me").then(r => r.json()).then(u => {
+    document.getElementById("user-info").innerHTML = `<span style="color:#94A3B8">${esc(u.name)}</span><br><span style="color:#5E8FAD;font-size:0.72rem">${u.role.toUpperCase()}</span>`;
+  });
+
+  loadUsers();
+</script>
+</body>
+</html>
