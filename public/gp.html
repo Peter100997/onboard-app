@@ -11,6 +11,7 @@
       --navy:   #1A2E44;
       --teal:   #0D9488;
       --teal-l: #14B8A8;
+      --teal-bg:#F0FDFA;
       --off-w:  #F8FAFC;
       --slate:  #64748B;
       --light:  #E2E8F0;
@@ -18,265 +19,276 @@
       --warn:   #F59E0B;
       --ok:     #10B981;
       --purple: #8B5CF6;
+      --blue:   #3B82F6;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--off-w);
-      color: #1E293B;
-      min-height: 100vh;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+           background: var(--off-w); color: #1E293B; min-height: 100vh; }
 
-    /* ── Sidebar ── */
+    /* ── Layout ── */
     .layout { display: flex; min-height: 100vh; }
 
-    aside {
-      width: 220px;
-      background: var(--navy);
-      padding: 0;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-logo {
-      padding: 1.4rem 1.5rem 1rem;
-      display: flex; align-items: center; gap: 10px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .logo-mark {
-      width: 34px; height: 34px; background: var(--teal);
-      border-radius: 8px; display: flex; align-items: center;
-      justify-content: center; font-weight: 800; color: #fff; font-size: 15px;
-    }
+    /* ── Sidebar ── */
+    aside { width: 220px; background: var(--navy); flex-shrink: 0; display: flex; flex-direction: column; }
+    .sidebar-logo { padding: 1.4rem 1.5rem 1rem; display: flex; align-items: center; gap: 10px;
+                    border-bottom: 1px solid rgba(255,255,255,.08); }
+    .logo-mark { width: 34px; height: 34px; background: var(--teal); border-radius: 8px;
+                 display: flex; align-items: center; justify-content: center;
+                 font-weight: 800; color: #fff; font-size: 15px; }
     .sidebar-logo span { color: #fff; font-weight: 700; font-size: 1rem; }
-
-    .sidebar-section {
-      padding: 1rem 1rem 0.5rem;
-      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1.2px; color: #5E8FAD;
-    }
-
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 1.5rem; font-size: 0.87rem; color: #94A3B8;
-      cursor: pointer; border-radius: 0; transition: all .2s;
-      text-decoration: none;
-    }
+    .sidebar-section { padding: 1rem 1rem 0.5rem; font-size: 0.68rem; font-weight: 700;
+                       text-transform: uppercase; letter-spacing: 1.2px; color: #5E8FAD; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 1.5rem;
+                font-size: 0.87rem; color: #94A3B8; cursor: pointer; text-decoration: none;
+                transition: all .2s; }
     .nav-item:hover { color: #fff; background: rgba(255,255,255,.06); }
-    .nav-item.active { color: #fff; background: rgba(13,148,136,.2);
-      border-right: 3px solid var(--teal); }
+    .nav-item.active { color: #fff; background: rgba(13,148,136,.2); border-right: 3px solid var(--teal); }
     .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
-
     .sidebar-spacer { flex: 1; }
-    .sidebar-footer {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid rgba(255,255,255,.08);
-      font-size: 0.78rem; color: #5E8FAD;
-    }
+    .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.08);
+                      font-size: 0.78rem; color: #5E8FAD; }
     .sidebar-fund { color: #94A3B8; font-weight: 600; }
 
     /* ── Main ── */
-    main { flex: 1; overflow-y: auto; }
-
-    .topbar {
-      background: #fff;
-      border-bottom: 1px solid var(--light);
-      padding: 0 2rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    main { flex: 1; overflow-y: auto; min-width: 0; }
+    .topbar { background: #fff; border-bottom: 1px solid var(--light); padding: 0 2rem;
+              height: 60px; display: flex; align-items: center; justify-content: space-between; }
     .topbar h1 { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
-    .topbar-right { display: flex; align-items: center; gap: 1rem; }
-    .refresh-btn {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px; background: var(--teal); color: #fff;
-      border: none; border-radius: 8px; font-size: 0.82rem;
-      font-weight: 600; cursor: pointer; transition: background .2s;
-    }
-    .refresh-btn:hover { background: var(--teal-l); }
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .btn-top { display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+               border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+               cursor: pointer; transition: all .2s; border: none; }
+    .btn-teal   { background: var(--teal); color: #fff; }
+    .btn-teal:hover { background: var(--teal-l); }
+    .btn-ghost  { background: transparent; color: var(--slate); border: 1.5px solid var(--light); }
+    .btn-ghost:hover { background: var(--off-w); }
     .last-updated { font-size: 0.78rem; color: var(--slate); }
 
     .content { padding: 1.8rem 2rem; }
 
     /* ── Stat cards ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.8rem;
-    }
-
-    .stat-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1.2rem 1.4rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.8rem; }
+    .stat-card { background: #fff; border-radius: 12px; padding: 1.2rem 1.4rem;
+                 box-shadow: 0 2px 12px rgba(0,0,0,.06); }
     .stat-label { font-size: 0.73rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.8px; color: var(--slate); margin-bottom: 0.5rem; }
+                  letter-spacing: 0.8px; color: var(--slate); margin-bottom: 0.5rem; }
     .stat-value { font-size: 2rem; font-weight: 800; color: var(--navy); line-height: 1; }
-    .stat-sub { font-size: 0.78rem; color: var(--slate); margin-top: 4px; }
-
+    .stat-sub   { font-size: 0.78rem; color: var(--slate); margin-top: 4px; }
     .stat-card.highlight { background: var(--navy); }
     .stat-card.highlight .stat-label { color: #6B9FBD; }
     .stat-card.highlight .stat-value { color: var(--teal-l); }
     .stat-card.highlight .stat-sub   { color: #5E8FAD; }
 
-    /* ── Two-col layout ── */
-    .two-col { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
-
-    /* ── LP table ── */
-    .section-card {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-      overflow: hidden;
-    }
-
-    .section-head {
-      padding: 1.2rem 1.5rem;
-      border-bottom: 1px solid var(--light);
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    /* ── LP Pipeline Table ── */
+    .section-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
+                    overflow: hidden; margin-bottom: 1.5rem; }
+    .section-head { padding: 1rem 1.5rem; border-bottom: 1px solid var(--light);
+                    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
     .section-head h2 { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
-    .section-head .count-badge {
-      background: var(--off-w); color: var(--slate);
-      padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
-    }
+
+    .filter-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-input { border: 1.5px solid var(--light); border-radius: 8px; padding: 5px 10px;
+                    font-size: 0.82rem; color: var(--slate); outline: none; }
+    .filter-input:focus { border-color: var(--teal); }
+    .filter-select { border: 1.5px solid var(--light); border-radius: 8px; padding: 5px 10px;
+                     font-size: 0.82rem; color: var(--slate); background: #fff; outline: none; cursor: pointer; }
+
+    .count-badge { background: var(--off-w); color: var(--slate); padding: 3px 10px;
+                   border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
 
     table { width: 100%; border-collapse: collapse; }
-    thead th {
-      padding: 10px 1.5rem;
-      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.8px; color: var(--slate);
-      background: var(--off-w); text-align: left;
-    }
-    tbody tr { border-bottom: 1px solid var(--light); transition: background .15s; }
+    thead th { padding: 9px 1rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+               letter-spacing: 0.8px; color: var(--slate); background: var(--off-w); text-align: left; }
+    tbody tr { border-bottom: 1px solid var(--light); cursor: pointer; transition: background .15s; }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--off-w); }
-    tbody td { padding: 11px 1.5rem; font-size: 0.87rem; color: #334155; }
+    tbody tr:hover { background: #F1FBF9; }
+    tbody tr.selected-row { background: var(--teal-bg); }
+    tbody td { padding: 10px 1rem; font-size: 0.87rem; color: #334155; }
 
-    .lp-name-cell { font-weight: 600; color: var(--navy); }
-    .lp-email-cell { color: var(--slate); font-size: 0.8rem; }
+    .lp-name-cell  { font-weight: 600; color: var(--navy); }
+    .lp-email-cell { color: var(--slate); font-size: 0.78rem; }
 
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 10px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 700;
-    }
+    /* Status pills */
+    .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px;
+                   border-radius: 20px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
     .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .pill-submitted  { background: #F1F5F9; color: #64748B; }
+    .pill-submitted .pill-dot  { background: #94A3B8; }
+    .pill-review     { background: #FFFBEB; color: #92400E; }
+    .pill-review .pill-dot     { background: var(--warn); }
+    .pill-legal      { background: #EDE9FE; color: #5B21B6; }
+    .pill-legal .pill-dot      { background: var(--purple); }
+    .pill-compliance { background: #EFF6FF; color: #1E40AF; }
+    .pill-compliance .pill-dot { background: var(--blue); }
+    .pill-approved   { background: #ECFDF5; color: #065F46; }
+    .pill-approved .pill-dot   { background: var(--ok); }
+    .pill-rejected   { background: #FEF2F2; color: #991B1B; }
+    .pill-rejected .pill-dot   { background: var(--danger); }
 
-    .pill-submitted   { background: #F1F5F9; color: #64748B; }
-    .pill-submitted .pill-dot   { background: #94A3B8; }
-    .pill-review      { background: #FFFBEB; color: #92400E; }
-    .pill-review .pill-dot      { background: var(--warn); }
-    .pill-legal       { background: #EDE9FE; color: #5B21B6; }
-    .pill-legal .pill-dot       { background: var(--purple); }
-    .pill-compliance  { background: #EFF6FF; color: #1E40AF; }
-    .pill-compliance .pill-dot  { background: #3B82F6; }
-    .pill-approved    { background: #ECFDF5; color: #065F46; }
-    .pill-approved .pill-dot    { background: var(--ok); }
-    .pill-rejected    { background: #FEF2F2; color: #991B1B; }
-    .pill-rejected .pill-dot    { background: var(--danger); }
+    /* Progress mini */
+    .progress-mini { display: flex; align-items: center; gap: 6px; }
+    .progress-mini-bar { width: 60px; height: 5px; background: var(--light); border-radius: 3px; overflow: hidden; }
+    .progress-mini-fill { height: 100%; border-radius: 3px; }
+    .progress-mini-text { font-size: 0.75rem; color: var(--slate); font-weight: 600; min-width: 30px; }
 
-    .score-mini {
-      display: flex; align-items: center; gap: 8px;
-    }
-    .score-mini-bar {
-      width: 60px; height: 6px; background: var(--light);
-      border-radius: 4px; overflow: hidden;
-    }
-    .score-mini-fill {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--teal), var(--teal-l));
-    }
-    .score-mini-val { font-size: 0.82rem; color: var(--slate); font-weight: 600; width: 28px; }
+    .score-mini { display: flex; align-items: center; gap: 7px; }
+    .score-mini-bar  { width: 50px; height: 5px; background: var(--light); border-radius: 3px; overflow: hidden; }
+    .score-mini-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--teal), var(--teal-l)); }
+    .score-mini-val  { font-size: 0.8rem; color: var(--slate); font-weight: 600; min-width: 24px; }
 
-    .notion-link {
-      display: inline-flex; align-items: center; gap: 4px;
-      color: var(--slate); font-size: 0.8rem; text-decoration: none;
-      padding: 3px 8px; border-radius: 6px; transition: all .15s;
-    }
-    .notion-link:hover { background: var(--light); color: var(--navy); }
+    .jur-badge { display: inline-block; padding: 2px 7px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; }
+    .jur-EU  { background: #EFF6FF; color: #1E40AF; }
+    .jur-UK  { background: #F5F3FF; color: #6B21A8; }
+    .jur-CH  { background: #FFF1F2; color: #9F1239; }
+    .jur-INT { background: #F0FDF4; color: #14532D; }
 
-    /* ── Right column ── */
-    .right-col { display: flex; flex-direction: column; gap: 1.5rem; }
+    /* ── Detail Drawer ── */
+    .drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35);
+                      z-index: 200; backdrop-filter: blur(2px); }
+    .drawer-overlay.open { display: block; }
 
-    /* Status breakdown */
-    .breakdown-list { padding: 0.5rem 0; }
-    .breakdown-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.7rem 1.5rem;
-      border-bottom: 1px solid var(--light);
-    }
-    .breakdown-item:last-child { border-bottom: none; }
-    .breakdown-label { display: flex; align-items: center; gap: 8px; font-size: 0.87rem; }
-    .bd-dot { width: 9px; height: 9px; border-radius: 50%; }
-    .breakdown-count { font-weight: 700; color: var(--navy); font-size: 0.9rem; }
-    .breakdown-bar-wrap { flex: 1; margin: 0 14px; }
-    .breakdown-bar { height: 5px; background: var(--light); border-radius: 4px; overflow: hidden; }
-    .breakdown-bar-fill { height: 100%; border-radius: 4px; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(720px, 100vw);
+              background: #fff; z-index: 201; display: flex; flex-direction: column;
+              box-shadow: -8px 0 32px rgba(0,0,0,.15);
+              transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); }
+    .drawer.open { transform: translateX(0); }
 
-    /* Recent activity */
-    .activity-list { padding: 0; }
-    .activity-item {
-      padding: 0.9rem 1.5rem;
-      border-bottom: 1px solid var(--light);
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .activity-item:last-child { border-bottom: none; }
-    .act-name { font-weight: 600; font-size: 0.88rem; color: var(--navy); }
-    .act-meta { font-size: 0.78rem; color: var(--slate); }
-    .act-rec { font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
-    .rec-approve  { color: var(--ok); }
-    .rec-review   { color: var(--warn); }
-    .rec-reject   { color: var(--danger); }
+    .drawer-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--light);
+                     display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+    .drawer-lp-name { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+    .drawer-lp-meta { font-size: 0.82rem; color: var(--slate); margin-top: 3px; }
+    .drawer-close { background: none; border: none; font-size: 1.4rem; color: var(--slate);
+                    cursor: pointer; padding: 0 4px; line-height: 1; }
+    .drawer-close:hover { color: var(--navy); }
+
+    .drawer-tabs { display: flex; border-bottom: 1px solid var(--light); flex-shrink: 0; }
+    .drawer-tab { padding: 0.75rem 1.5rem; font-size: 0.85rem; font-weight: 600; color: var(--slate);
+                  cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; }
+    .drawer-tab:hover { color: var(--navy); }
+    .drawer-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+    .drawer-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
+
+    /* ── AI Review panel ── */
+    .ai-review-box { background: linear-gradient(135deg, var(--navy), #0D4F6C);
+                     border-radius: 10px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; color: #fff; }
+    .ai-review-box .ai-title { font-size: 0.8rem; font-weight: 700; color: var(--teal-l);
+                                text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .ai-summary-text { font-size: 0.88rem; line-height: 1.5; color: #CBD5E1; margin-bottom: 0.8rem; }
+    .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .ai-item .ai-item-label { font-size: 0.68rem; color: #8EADC7; text-transform: uppercase;
+                               letter-spacing: 0.05em; margin-bottom: 0.2rem; }
+    .ai-item .ai-item-val { font-size: 0.88rem; font-weight: 600; }
+    .ai-score-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.8rem; }
+    .ai-score-label { font-size: 0.72rem; color: #8EADC7; }
+    .ai-score-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,.15); border-radius: 3px; }
+    .ai-score-bar-fill { height: 100%; border-radius: 3px; background: var(--teal); }
+    .ai-score-val { font-size: 0.82rem; font-weight: 700; color: var(--teal-l); min-width: 36px; }
+
+    /* Status select in drawer */
+    .status-update-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.2rem;
+                         background: var(--off-w); border-radius: 8px; padding: 0.8rem 1rem; }
+    .status-update-row label { font-size: 0.78rem; font-weight: 700; color: var(--navy); text-transform: uppercase; }
+    .status-select { border: 1.5px solid var(--light); border-radius: 8px; padding: 5px 10px;
+                     font-size: 0.85rem; background: #fff; cursor: pointer; flex: 1; outline: none; }
+    .status-select:focus { border-color: var(--teal); }
+    .save-status-btn { padding: 6px 16px; background: var(--teal); color: #fff; border: none;
+                       border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .save-status-btn:hover { background: var(--teal-l); }
+
+    /* ── Compliance Checklist Table ── */
+    .checklist-header { display: flex; align-items: center; justify-content: space-between;
+                        margin-bottom: 1rem; }
+    .checklist-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+    .checklist-actions { display: flex; gap: 0.5rem; }
+    .btn-sm { padding: 5px 12px; border-radius: 7px; font-size: 0.78rem; font-weight: 600;
+              border: none; cursor: pointer; transition: all .2s; }
+    .btn-sm-teal  { background: var(--teal); color: #fff; }
+    .btn-sm-teal:hover  { background: var(--teal-l); }
+    .btn-sm-ghost { background: var(--off-w); color: var(--slate); border: 1px solid var(--light); }
+    .btn-sm-ghost:hover { background: var(--light); }
+
+    /* Checklist category header */
+    .cl-category { font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 0.08em; color: #94A3B8; padding: 0.5rem 0 0.3rem;
+                   border-bottom: 1px solid var(--light); margin: 0.5rem 0 0.4rem; }
+    .cl-category:first-child { margin-top: 0; }
+
+    /* Checklist row */
+    .cl-row { display: grid; grid-template-columns: 1fr 120px 90px; gap: 0.5rem;
+              align-items: start; padding: 0.5rem 0; border-bottom: 1px solid #F1F5F9; }
+    .cl-row:last-child { border-bottom: none; }
+    .cl-item-name { font-size: 0.85rem; font-weight: 600; color: var(--navy); line-height: 1.3; }
+    .cl-item-ref  { font-size: 0.68rem; color: #94A3B8; margin-top: 2px; }
+    .cl-item-req  { font-size: 0.7rem; }
+    .cl-item-notes-input { width: 100%; border: 1px solid var(--light); border-radius: 6px;
+                           padding: 3px 7px; font-size: 0.75rem; color: var(--slate);
+                           background: #FAFAFA; outline: none; margin-top: 4px; resize: none; }
+    .cl-item-notes-input:focus { border-color: var(--teal); background: #fff; }
+    .cl-item-verified { font-size: 0.68rem; color: #94A3B8; margin-top: 3px; }
+
+    /* Status select in checklist row */
+    .cl-status-select { width: 100%; border: 1.5px solid var(--light); border-radius: 7px;
+                        padding: 4px 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+                        outline: none; background: #fff; appearance: none; text-align: center; }
+    .cl-status-select:focus { border-color: var(--teal); }
+    .cl-status-select.s-pending   { border-color: #CBD5E1; color: #64748B; background: #F8FAFC; }
+    .cl-status-select.s-received  { border-color: var(--blue);   color: #1E40AF; background: #EFF6FF; }
+    .cl-status-select.s-verified  { border-color: var(--ok);     color: #065F46; background: #ECFDF5; }
+    .cl-status-select.s-failed    { border-color: var(--danger);  color: #991B1B; background: #FEF2F2; }
+    .cl-status-select.s-waived    { border-color: var(--warn);    color: #92400E; background: #FFFBEB; }
+
+    .required-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+                    background: var(--danger); margin-right: 4px; vertical-align: middle; }
+    .optional-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+                    background: #CBD5E1; margin-right: 4px; vertical-align: middle; }
+
+    /* Progress bar in checklist header */
+    .cl-progress { display: flex; align-items: center; gap: 0.75rem; background: var(--teal-bg);
+                   border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 1rem; }
+    .cl-progress-label { font-size: 0.78rem; color: #0F766E; font-weight: 600; }
+    .cl-progress-bar-bg { flex: 1; height: 7px; background: rgba(13,148,136,.15); border-radius: 4px; }
+    .cl-progress-bar-fill { height: 100%; border-radius: 4px; background: var(--teal); transition: width .5s ease; }
+    .cl-progress-pct { font-size: 0.78rem; font-weight: 700; color: var(--teal); min-width: 36px; }
+
+    .save-all-btn { width: 100%; padding: 0.7rem; background: var(--teal); color: #fff;
+                    border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 700;
+                    cursor: pointer; margin-top: 1.2rem; transition: background .2s; }
+    .save-all-btn:hover { background: var(--teal-l); }
+    .save-all-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.2rem;
+             background: var(--navy); color: #fff; border-radius: 10px; font-size: 0.85rem;
+             font-weight: 600; z-index: 999; opacity: 0; transform: translateY(10px);
+             transition: all .3s; pointer-events: none; max-width: 320px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.toast-ok   { background: #0F766E; }
+    .toast.toast-err  { background: #991B1B; }
+
+    /* ── Loading ── */
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,.7);
+                       align-items: center; justify-content: center; z-index: 999; }
+    .loading-overlay.visible { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--light);
+               border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Empty state ── */
-    .empty-state {
-      padding: 3rem 2rem;
-      text-align: center;
-      color: var(--slate);
-    }
+    .empty-state { padding: 3rem 2rem; text-align: center; color: var(--slate); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
     .empty-state h3 { margin-bottom: 0.3rem; color: var(--navy); font-size: 1rem; }
     .empty-state p { font-size: 0.85rem; }
 
-    /* ── Loading ── */
-    .loading-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(255,255,255,.7);
-      align-items: center; justify-content: center;
-      z-index: 999;
-    }
-    .loading-overlay.visible { display: flex; }
-    .spinner {
-      width: 40px; height: 40px; border: 3px solid var(--light);
-      border-top-color: var(--teal); border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     /* Responsive */
-    @media (max-width: 1100px) {
-      .two-col { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 680px) {
-      aside { display: none; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 680px) { aside { display: none; } }
   </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
-</div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
 
 <div class="layout">
 
@@ -287,18 +299,12 @@
       <span>Onboard</span>
     </div>
     <div class="sidebar-section">GP Workspace</div>
-    <a class="nav-item active" href="/gp">
-      <span class="nav-icon">📊</span> Dashboard
-    </a>
-    <a class="nav-item" href="/" target="_blank">
-      <span class="nav-icon">📝</span> LP Form
-    </a>
-    <a class="nav-item" href="/status" target="_blank">
-      <span class="nav-icon">🔍</span> Status Lookup
-    </a>
-    <div class="sidebar-section" style="margin-top:1rem;">Notion Databases</div>
+    <a class="nav-item active" href="/gp"><span class="nav-icon">📊</span> LP Pipeline</a>
+    <a class="nav-item" href="/" target="_blank"><span class="nav-icon">📝</span> LP Form</a>
+    <a class="nav-item" href="/status" target="_blank"><span class="nav-icon">🔍</span> Status Lookup</a>
+    <div class="sidebar-section" style="margin-top:1rem;">Notion</div>
     <a class="nav-item" href="https://www.notion.so/3f253f1689b74b58a5344ccd76600b49" target="_blank">
-      <span class="nav-icon">👤</span> LP Pipeline
+      <span class="nav-icon">👤</span> LP Pipeline DB
     </a>
     <a class="nav-item" href="https://www.notion.so/928b845946e649758dcb57ce4c1e16bc" target="_blank">
       <span class="nav-icon">✅</span> Compliance Tasks
@@ -317,31 +323,27 @@
   <!-- Main -->
   <main>
     <div class="topbar">
-      <h1>GP Operations Dashboard</h1>
+      <h1>LP Pipeline & Compliance</h1>
       <div class="topbar-right">
         <span class="last-updated" id="last-updated">Refreshing…</span>
-        <button class="refresh-btn" onclick="loadDashboard()">
-          ↻ Refresh
-        </button>
-        <button class="refresh-btn" style="background:transparent;border:1.5px solid var(--light);color:var(--slate);" onclick="logout()">
-          Sign out
-        </button>
+        <button class="btn-top btn-teal" onclick="loadAll()">↻ Refresh</button>
+        <button class="btn-top btn-ghost" onclick="logout()">Sign out</button>
       </div>
     </div>
 
     <div class="content">
 
-      <!-- Stat cards -->
-      <div class="stats-grid" id="stats-grid">
+      <!-- Stats -->
+      <div class="stats-grid">
         <div class="stat-card highlight">
           <div class="stat-label">Total LPs</div>
           <div class="stat-value" id="stat-total">—</div>
           <div class="stat-sub">Submitted to date</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Avg Score</div>
+          <div class="stat-label">Avg AI Score</div>
           <div class="stat-value" id="stat-avg">—</div>
-          <div class="stat-sub">Onboarding readiness</div>
+          <div class="stat-sub">Compliance readiness</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Under Review</div>
@@ -351,279 +353,543 @@
         <div class="stat-card">
           <div class="stat-label">Approved</div>
           <div class="stat-value" id="stat-approved">—</div>
-          <div class="stat-sub" id="stat-approved-pct">—</div>
+          <div class="stat-sub" id="stat-pct">—</div>
         </div>
       </div>
 
-      <!-- Two-col -->
-      <div class="two-col">
-
-        <!-- LP table -->
-        <div class="section-card">
-          <div class="section-head">
+      <!-- LP Pipeline Table -->
+      <div class="section-card">
+        <div class="section-head">
+          <div style="display:flex;align-items:center;gap:0.75rem">
             <h2>LP Pipeline</h2>
             <span class="count-badge" id="lp-count">0 LPs</span>
           </div>
-          <div id="lp-table-wrap">
-            <div class="empty-state">
-              <div class="empty-icon">⏳</div>
-              <h3>Loading…</h3>
-            </div>
+          <div class="filter-row">
+            <input class="filter-input" id="search-input" placeholder="Search name / email…" oninput="filterTable()">
+            <select class="filter-select" id="filter-status" onchange="filterTable()">
+              <option value="">All statuses</option>
+              <option>Form Submitted</option>
+              <option>Under Review</option>
+              <option>Legal Check</option>
+              <option>Compliance Check</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+            </select>
+            <select class="filter-select" id="filter-jur" onchange="filterTable()">
+              <option value="">All jurisdictions</option>
+              <option value="EU">EU / AIFMD</option>
+              <option value="UK">UK / FCA</option>
+              <option value="CH">Switzerland</option>
+              <option value="INT">International</option>
+            </select>
           </div>
         </div>
-
-        <!-- Right col -->
-        <div class="right-col">
-
-          <!-- Status breakdown -->
-          <div class="section-card">
-            <div class="section-head">
-              <h2>Status Breakdown</h2>
-            </div>
-            <div class="breakdown-list" id="breakdown-list">
-              <div class="empty-state" style="padding:1.5rem">
-                <div style="font-size:0.85rem;color:var(--slate)">No data yet</div>
-              </div>
-            </div>
+        <div id="lp-table-wrap">
+          <div class="empty-state">
+            <div class="empty-icon">⏳</div><h3>Loading…</h3>
           </div>
-
-          <!-- Recent activity -->
-          <div class="section-card">
-            <div class="section-head">
-              <h2>Recent Activity</h2>
-            </div>
-            <div class="activity-list" id="activity-list">
-              <div class="empty-state" style="padding:1.5rem">
-                <div style="font-size:0.85rem;color:var(--slate)">No recent activity</div>
-              </div>
-            </div>
-          </div>
-
         </div>
-
       </div>
-    </div>
+
+    </div><!-- /content -->
   </main>
-</div>
+</div><!-- /layout -->
+
+<!-- ── LP Detail Drawer ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-lp-name" id="d-name">—</div>
+      <div class="drawer-lp-meta" id="d-meta">—</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-tabs">
+    <div class="drawer-tab active" onclick="showTab('tab-review', this)">AI Review</div>
+    <div class="drawer-tab" onclick="showTab('tab-checklist', this)">Compliance Checklist</div>
+  </div>
+  <div class="drawer-body">
+
+    <!-- Tab: AI Review -->
+    <div id="tab-review">
+      <!-- Status control -->
+      <div class="status-update-row">
+        <label>Pipeline Status</label>
+        <select class="status-select" id="d-status-select">
+          <option>Form Submitted</option>
+          <option>Under Review</option>
+          <option>Legal Check</option>
+          <option>Compliance Check</option>
+          <option>Approved</option>
+          <option>Rejected</option>
+        </select>
+        <button class="save-status-btn" onclick="saveStatus()">Save</button>
+      </div>
+
+      <!-- AI review -->
+      <div class="ai-review-box">
+        <div class="ai-title">🤖 Claude AI Compliance Review</div>
+        <div class="ai-summary-text" id="d-ai-summary">—</div>
+        <div class="ai-grid">
+          <div class="ai-item">
+            <div class="ai-item-label">Recommendation</div>
+            <div class="ai-item-val" id="d-rec" style="color:var(--teal-l)">—</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-item-label">PEP Status</div>
+            <div class="ai-item-val" id="d-pep" style="color:#F8FAFC">—</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-item-label">Sanctions</div>
+            <div class="ai-item-val" id="d-sanc" style="color:#F8FAFC">—</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-item-label">Missing Items</div>
+            <div class="ai-item-val" id="d-missing" style="color:#F59E0B;font-size:0.8rem">—</div>
+          </div>
+        </div>
+        <div class="ai-score-row">
+          <span class="ai-score-label">COMPLETENESS SCORE</span>
+          <div class="ai-score-bar-bg"><div class="ai-score-bar-fill" id="d-score-bar" style="width:0%"></div></div>
+          <span class="ai-score-val" id="d-score-val">—</span>
+        </div>
+      </div>
+
+      <!-- LP info grid -->
+      <div id="d-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem"></div>
+    </div>
+
+    <!-- Tab: Compliance Checklist -->
+    <div id="tab-checklist" style="display:none">
+      <div class="cl-progress">
+        <span class="cl-progress-label">Verification Progress</span>
+        <div class="cl-progress-bar-bg">
+          <div class="cl-progress-bar-fill" id="cl-progress-fill" style="width:0%"></div>
+        </div>
+        <span class="cl-progress-pct" id="cl-progress-pct">0%</span>
+      </div>
+
+      <div class="checklist-header">
+        <h3>Required Compliance Checks</h3>
+        <div class="checklist-actions">
+          <button class="btn-sm btn-sm-ghost" onclick="markAll('Received')">Mark All Received</button>
+        </div>
+      </div>
+
+      <div id="cl-items">
+        <div class="empty-state" style="padding:2rem">
+          <p>Select an LP from the pipeline to review their compliance checklist.</p>
+        </div>
+      </div>
+
+      <button class="save-all-btn" id="save-all-btn" onclick="saveChecklist()">
+        💾 Save Compliance Changes
+      </button>
+    </div>
+
+  </div><!-- /drawer-body -->
+</div><!-- /drawer -->
 
 <script>
-  const STATUS_COLORS = {
-    "Form Submitted":   { pill: "pill-submitted",  dot: "#94A3B8", bar: "#94A3B8" },
-    "Under Review":     { pill: "pill-review",      dot: "#F59E0B", bar: "#F59E0B" },
-    "Legal Check":      { pill: "pill-legal",       dot: "#8B5CF6", bar: "#8B5CF6" },
-    "Compliance Check": { pill: "pill-compliance",  dot: "#3B82F6", bar: "#3B82F6" },
-    "Approved":         { pill: "pill-approved",    dot: "#10B981", bar: "#10B981" },
-    "Rejected":         { pill: "pill-rejected",    dot: "#EF4444", bar: "#EF4444" },
-  };
+const STATUS_COLORS = {
+  "Form Submitted":   { pill: "pill-submitted",  dot: "#94A3B8" },
+  "Under Review":     { pill: "pill-review",      dot: "#F59E0B" },
+  "Legal Check":      { pill: "pill-legal",       dot: "#8B5CF6" },
+  "Compliance Check": { pill: "pill-compliance",  dot: "#3B82F6" },
+  "Approved":         { pill: "pill-approved",    dot: "#10B981" },
+  "Rejected":         { pill: "pill-rejected",    dot: "#EF4444" },
+};
 
-  function statusPill(status) {
-    const cfg = STATUS_COLORS[status] || STATUS_COLORS["Form Submitted"];
-    return `<span class="status-pill ${cfg.pill}">
-      <span class="pill-dot" style="background:${cfg.dot}"></span>
-      ${status}
-    </span>`;
-  }
+let allLPs = [];
+let currentLP = null;
 
-  function scoreMini(score) {
-    return `<div class="score-mini">
-      <div class="score-mini-bar"><div class="score-mini-fill" style="width:${score}%"></div></div>
-      <span class="score-mini-val">${score}</span>
-    </div>`;
-  }
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s) { const d = document.createElement("div"); d.textContent = s||"—"; return d.innerHTML; }
 
-  function recClass(rec) {
-    if (rec === "Approve") return "rec-approve";
-    if (rec === "Reject")  return "rec-reject";
-    return "rec-review";
-  }
+function statusPill(status) {
+  const cfg = STATUS_COLORS[status] || STATUS_COLORS["Form Submitted"];
+  return `<span class="status-pill ${cfg.pill}">
+    <span class="pill-dot" style="background:${cfg.dot}"></span>${status}</span>`;
+}
 
-  function timeAgo(iso) {
-    if (!iso) return "";
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60)  return `${mins}m ago`;
-    if (mins < 1440) return `${Math.floor(mins/60)}h ago`;
-    return `${Math.floor(mins/1440)}d ago`;
-  }
+function scoreBar(score) {
+  return `<div class="score-mini">
+    <div class="score-mini-bar"><div class="score-mini-fill" style="width:${score}%"></div></div>
+    <span class="score-mini-val">${score}</span>
+  </div>`;
+}
 
-  async function loadAll() {
-    const [dashRes, queueRes] = await Promise.all([
+function progressBar(checklist) {
+  if (!checklist || !checklist.length) return `<span style="font-size:0.75rem;color:#94A3B8">—</span>`;
+  const done = checklist.filter(i => i.status === "Verified" || i.status === "Received" || i.status === "Waived").length;
+  const total = checklist.length;
+  const pct = Math.round(done / total * 100);
+  const color = pct >= 80 ? "#10B981" : pct >= 50 ? "#F59E0B" : "#EF4444";
+  return `<div class="progress-mini">
+    <div class="progress-mini-bar"><div class="progress-mini-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="progress-mini-text">${done}/${total}</span>
+  </div>`;
+}
+
+function jurBadge(jur) {
+  return `<span class="jur-badge jur-${jur||'INT'}">${jur||'—'}</span>`;
+}
+
+function toast(msg, type = "ok") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+function timeAgo(iso) {
+  if (!iso) return "—";
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 60)   return m + "m ago";
+  if (m < 1440) return Math.floor(m/60) + "h ago";
+  return Math.floor(m/1440) + "d ago";
+}
+
+// ── Load & render ─────────────────────────────────────────────────────────────
+async function loadAll() {
+  document.getElementById("loading").classList.add("visible");
+  try {
+    const [dashRes, lpsRes] = await Promise.all([
       fetch("/api/dashboard"),
       fetch("/api/all-lps")
     ]);
-    const dash  = await dashRes.json();
-    const allLps = queueRes.ok ? await queueRes.json() : [];
-    return { dash, allLps };
-  }
-
-  async function loadDashboard() {
-    document.getElementById("loading").classList.add("visible");
-
-    try {
-      const dashRes = await fetch("/api/dashboard");
-      if (dashRes.status === 401) { window.location.href = "/login?redirect=/gp"; return; }
-      const dash = await dashRes.json();
-
-      // All LPs: use recentSubmissions for now (server returns last 5)
-      // We'll load all via a separate call if available
-      let allLps = dash.recentSubmissions || [];
-
-      renderStats(dash);
-      renderBreakdown(dash.byStatus, dash.total);
-      renderLPTable(allLps);
-      renderActivity(allLps.slice(0, 5));
-
-      document.getElementById("last-updated").textContent =
-        "Updated " + new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-
-    } catch (e) {
-      console.error("Dashboard load error:", e);
-    } finally {
-      document.getElementById("loading").classList.remove("visible");
+    if (dashRes.status === 401 || lpsRes.status === 401) {
+      window.location.href = "/login?redirect=/gp"; return;
     }
+    const dash = await dashRes.json();
+    allLPs = lpsRes.ok ? await lpsRes.json() : [];
+
+    renderStats(dash);
+    renderTable(allLPs);
+    document.getElementById("last-updated").textContent =
+      "Updated " + new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  } catch(e) {
+    console.error("Load error:", e);
+    toast("Failed to load data", "err");
+  } finally {
+    document.getElementById("loading").classList.remove("visible");
   }
+}
 
-  function renderStats(dash) {
-    document.getElementById("stat-total").textContent = dash.total ?? "0";
-    document.getElementById("stat-avg").textContent   = dash.avgScore ?? "—";
+function renderStats(dash) {
+  document.getElementById("stat-total").textContent = dash.total ?? "0";
+  document.getElementById("stat-avg").textContent   = dash.avgScore ?? "—";
+  const bs = dash.byStatus || {};
+  document.getElementById("stat-review").textContent =
+    (bs["Under Review"]||0) + (bs["Legal Check"]||0) + (bs["Compliance Check"]||0);
+  const approved = bs["Approved"] || 0;
+  document.getElementById("stat-approved").textContent = approved;
+  document.getElementById("stat-pct").textContent =
+    dash.total ? Math.round(approved/dash.total*100) + "% conversion" : "No submissions yet";
+}
 
-    const byStatus = dash.byStatus || {};
-    const reviewing = (byStatus["Under Review"] || 0) +
-                      (byStatus["Legal Check"] || 0) +
-                      (byStatus["Compliance Check"] || 0);
-    document.getElementById("stat-review").textContent = reviewing;
+function renderTable(lps) {
+  const wrap = document.getElementById("lp-table-wrap");
+  document.getElementById("lp-count").textContent = lps.length + " LP" + (lps.length !== 1 ? "s" : "");
 
-    const approved = byStatus["Approved"] || 0;
-    document.getElementById("stat-approved").textContent = approved;
-    document.getElementById("stat-approved-pct").textContent =
-      dash.total ? `${Math.round(approved / dash.total * 100)}% conversion` : "No submissions yet";
-  }
-
-  function renderBreakdown(byStatus, total) {
-    const el = document.getElementById("breakdown-list");
-    if (!byStatus || Object.keys(byStatus).length === 0) {
-      el.innerHTML = `<div class="empty-state" style="padding:1.5rem">
-        <div style="font-size:0.85rem;color:var(--slate)">No data yet</div></div>`;
-      return;
-    }
-
-    const ORDER = ["Form Submitted","Under Review","Legal Check","Compliance Check","Approved","Rejected"];
-    const items = ORDER.filter(s => byStatus[s]).map(s => ({ status: s, count: byStatus[s] }));
-    // Add any unlisted statuses
-    Object.entries(byStatus).forEach(([s, c]) => {
-      if (!ORDER.includes(s)) items.push({ status: s, count: c });
-    });
-
-    el.innerHTML = items.map(({ status, count }) => {
-      const cfg = STATUS_COLORS[status] || { dot: "#94A3B8", bar: "#94A3B8" };
-      const pct = total ? Math.round(count / total * 100) : 0;
-      return `<div class="breakdown-item">
-        <div class="breakdown-label">
-          <div class="bd-dot" style="background:${cfg.dot}"></div>
-          ${status}
-        </div>
-        <div class="breakdown-bar-wrap">
-          <div class="breakdown-bar">
-            <div class="breakdown-bar-fill" style="width:${pct}%;background:${cfg.bar}"></div>
-          </div>
-        </div>
-        <div class="breakdown-count">${count}</div>
-      </div>`;
-    }).join("");
-  }
-
-  function renderLPTable(lps) {
-    const wrap = document.getElementById("lp-table-wrap");
-    document.getElementById("lp-count").textContent = lps.length + " LP" + (lps.length !== 1 ? "s" : "");
-
-    if (!lps.length) {
-      wrap.innerHTML = `<div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <h3>No LP submissions yet</h3>
-        <p>Submit the LP form to see investors appear here.</p>
-      </div>`;
-      return;
-    }
-
-    // Sort: most recent first
-    const sorted = [...lps].sort((a, b) =>
-      new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
-
-    wrap.innerHTML = `<div style="overflow-x:auto">
-      <table>
-        <thead>
-          <tr>
-            <th>LP Name</th>
-            <th>Type</th>
-            <th>Committed (€k)</th>
-            <th>Status</th>
-            <th>Score</th>
-            <th>Notion</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sorted.map(lp => `<tr>
-            <td>
-              <div class="lp-name-cell">${esc(lp.lpName)}</div>
-              <div class="lp-email-cell">${esc(lp.email)}</div>
-            </td>
-            <td>${esc(lp.investorType || "—")}</td>
-            <td>€${parseFloat(lp.committedAmount || 0).toLocaleString()}k</td>
-            <td>${statusPill(lp.status || "Form Submitted")}</td>
-            <td>${scoreMini(lp.review?.score ?? 0)}</td>
-            <td>${lp.notionId
-              ? `<a class="notion-link" href="https://notion.so/${lp.notionId.replace(/-/g,'')}" target="_blank">Open ↗</a>`
-              : `<span style="color:var(--slate);font-size:0.78rem">Local only</span>`
-            }</td>
-          </tr>`).join("")}
-        </tbody>
-      </table>
+  if (!lps.length) {
+    wrap.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No LP submissions yet</h3>
+      <p>Submit the <a href="/" target="_blank" style="color:var(--teal)">LP onboarding form</a> to see investors here.</p>
     </div>`;
+    return;
   }
 
-  function renderActivity(recent) {
-    const el = document.getElementById("activity-list");
-    if (!recent || !recent.length) {
-      el.innerHTML = `<div class="empty-state" style="padding:1.5rem">
-        <div style="font-size:0.85rem;color:var(--slate)">No recent activity</div></div>`;
-      return;
-    }
-    el.innerHTML = recent.map(lp => `<div class="activity-item">
-      <div class="act-name">${esc(lp.lpName)}</div>
-      <div class="act-meta">${esc(lp.fund || "—")} · ${timeAgo(lp.submittedAt)}</div>
-      <div class="act-rec ${recClass(lp.review?.recommendation)}">
-        ${lp.review?.recommendation || "Pending"}
-      </div>
+  const sorted = [...lps].sort((a, b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
+  wrap.innerHTML = `<div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>LP Name</th>
+          <th>Type</th>
+          <th>Jurisdiction</th>
+          <th>Commitment</th>
+          <th>Status</th>
+          <th>AI Score</th>
+          <th>Checklist</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody id="lp-tbody">
+        ${sorted.map(lp => `
+        <tr onclick="openLP('${lp.id}')" data-id="${lp.id}"
+            data-name="${esc(lp.lpName)}" data-email="${esc(lp.email)}"
+            data-status="${esc(lp.status)}" data-jur="${lp.jurisdiction||''}">
+          <td>
+            <div class="lp-name-cell">${esc(lp.lpName)}</div>
+            <div class="lp-email-cell">${esc(lp.email)}</div>
+          </td>
+          <td>${esc(lp.investorType||"—")}</td>
+          <td>${jurBadge(lp.jurisdiction)}</td>
+          <td>€${parseFloat(lp.committedAmount||0).toLocaleString()}k</td>
+          <td>${statusPill(lp.status||"Form Submitted")}</td>
+          <td>${scoreBar(lp.review?.score ?? 0)}</td>
+          <td>${progressBar(lp.complianceChecklist)}</td>
+          <td style="font-size:0.78rem;color:var(--slate)">${timeAgo(lp.submittedAt)}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function filterTable() {
+  const q    = document.getElementById("search-input").value.toLowerCase();
+  const fSt  = document.getElementById("filter-status").value;
+  const fJur = document.getElementById("filter-jur").value;
+  let filtered = allLPs;
+  if (q)    filtered = filtered.filter(l => l.lpName?.toLowerCase().includes(q) || l.email?.toLowerCase().includes(q));
+  if (fSt)  filtered = filtered.filter(l => l.status === fSt);
+  if (fJur) filtered = filtered.filter(l => l.jurisdiction === fJur);
+  renderTable(filtered);
+}
+
+// ── Drawer ────────────────────────────────────────────────────────────────────
+async function openLP(id) {
+  // Highlight row
+  document.querySelectorAll("#lp-tbody tr").forEach(r => r.classList.remove("selected-row"));
+  const row = document.querySelector(`tr[data-id="${id}"]`);
+  if (row) row.classList.add("selected-row");
+
+  // Fetch full LP
+  try {
+    const res = await fetch(`/api/lp/${id}`);
+    if (!res.ok) { toast("Could not load LP", "err"); return; }
+    currentLP = await res.json();
+    renderDrawer(currentLP);
+    document.getElementById("drawer-overlay").classList.add("open");
+    document.getElementById("drawer").classList.add("open");
+    showTab("tab-review", document.querySelector(".drawer-tab"));
+  } catch(e) {
+    toast("Failed to load LP details", "err");
+  }
+}
+
+function closeDrawer() {
+  document.getElementById("drawer-overlay").classList.remove("open");
+  document.getElementById("drawer").classList.remove("open");
+  document.querySelectorAll("#lp-tbody tr").forEach(r => r.classList.remove("selected-row"));
+  currentLP = null;
+}
+
+function showTab(tabId, el) {
+  document.getElementById("tab-review").style.display    = tabId === "tab-review"    ? "" : "none";
+  document.getElementById("tab-checklist").style.display = tabId === "tab-checklist" ? "" : "none";
+  document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+}
+
+function renderDrawer(lp) {
+  document.getElementById("d-name").textContent =
+    lp.lpName + " " + (lp.jurisdiction ? `(${lp.jurisdiction})` : "");
+  document.getElementById("d-meta").textContent =
+    [lp.investorType, lp.nationality, lp.fund].filter(Boolean).join(" · ");
+
+  // Status select
+  document.getElementById("d-status-select").value = lp.status || "Form Submitted";
+
+  // AI review
+  const r = lp.review || {};
+  document.getElementById("d-ai-summary").textContent = r.summary || "No review available.";
+  document.getElementById("d-rec").textContent       = r.recommendation || "—";
+  document.getElementById("d-pep").textContent       = r.pep_status || "—";
+  document.getElementById("d-sanc").textContent      = r.sanctions_clear || "—";
+  document.getElementById("d-missing").textContent   = r.missing_items || "None";
+  const score = r.score ?? 0;
+  document.getElementById("d-score-bar").style.width = score + "%";
+  document.getElementById("d-score-val").textContent = score + "/100";
+
+  // Info grid
+  const infoItems = [
+    ["Fund",             lp.fund],
+    ["Committed",        "€" + parseFloat(lp.committedAmount||0).toLocaleString() + "k"],
+    ["Source of Wealth", lp.sourceOfWealth],
+    ["PEP Declaration",  lp.pepStatus === "Yes" ? "⚠️ PEP — Enhanced DD" : "✓ Not a PEP"],
+    ["KYC Docs",         lp.kycDocs ? "✓ Confirmed" : "Pending"],
+    ["Submitted",        lp.submittedAt ? new Date(lp.submittedAt).toLocaleDateString("en-GB") : "—"],
+  ];
+  document.getElementById("d-info-grid").innerHTML = infoItems.map(([l, v]) => `
+    <div style="background:var(--off-w);border-radius:7px;padding:0.55rem 0.75rem">
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:2px">${l}</div>
+      <div style="font-size:0.88rem;color:var(--navy);font-weight:500">${esc(v)}</div>
     </div>`).join("");
+
+  // Checklist
+  renderChecklist(lp.complianceChecklist || []);
+}
+
+function renderChecklist(checklist) {
+  const el = document.getElementById("cl-items");
+
+  if (!checklist || !checklist.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:2rem">
+      <p>No checklist data. Re-submit the LP form to generate compliance items.</p>
+    </div>`;
+    updateProgress(0, 0);
+    return;
   }
 
-  function esc(str) {
-    const d = document.createElement("div");
-    d.textContent = str || "—";
-    return d.innerHTML;
-  }
+  // Group by category
+  const cats = {};
+  checklist.forEach(item => {
+    if (!cats[item.category]) cats[item.category] = [];
+    cats[item.category].push(item);
+  });
 
-  async function logout() {
-    await fetch("/auth/logout", { method: "POST" });
-    window.location.href = "/login";
-  }
+  el.innerHTML = Object.entries(cats).map(([cat, items]) => `
+    <div class="cl-category">${cat}</div>
+    ${items.map(item => `
+    <div class="cl-row" data-item-id="${item.id}">
+      <div>
+        <div class="cl-item-name">
+          <span class="${item.required ? 'required-dot' : 'optional-dot'}"></span>${esc(item.item)}
+        </div>
+        <div class="cl-item-ref">${esc(item.ref || "")}</div>
+        <textarea class="cl-item-notes-input" placeholder="GP notes…" rows="1"
+          data-item-id="${item.id}">${esc(item.gpNotes || "")}</textarea>
+        ${item.verifiedBy ? `<div class="cl-item-verified">✓ ${esc(item.verifiedBy)} · ${item.verifiedAt ? new Date(item.verifiedAt).toLocaleDateString("en-GB") : ""}</div>` : ""}
+      </div>
+      <div>
+        <select class="cl-status-select s-${item.status?.toLowerCase()||'pending'}"
+          data-item-id="${item.id}" onchange="onStatusSelectChange(this)">
+          <option value="Pending"  ${item.status==="Pending"   ? "selected" : ""}>Pending</option>
+          <option value="Received" ${item.status==="Received"  ? "selected" : ""}>Received</option>
+          <option value="Verified" ${item.status==="Verified"  ? "selected" : ""}>Verified</option>
+          <option value="Failed"   ${item.status==="Failed"    ? "selected" : ""}>Failed</option>
+          <option value="Waived"   ${item.status==="Waived"    ? "selected" : ""}>Waived</option>
+        </select>
+      </div>
+      <div style="font-size:0.7rem;color:var(--slate)">
+        ${item.required ? '<span style="color:var(--danger);font-weight:700">Required</span>' : '<span style="color:#94A3B8">Optional</span>'}
+      </div>
+    </div>`).join("")}
+  `).join("");
 
-  // Load current user info
-  fetch("/auth/me").then(r => {
-    if (r.status === 401) { window.location.href = "/login?redirect=/gp"; return null; }
-    return r.json();
-  }).then(u => {
-    if (!u) return;
-    const el = document.getElementById("sidebar-user");
-    if (el) {
-      el.innerHTML = `<span style="font-weight:600">${esc(u.name)}</span><br>
-        <span style="font-size:0.72rem;color:#5E8FAD">${u.role.toUpperCase()}</span>`;
+  updateProgress(checklist);
+}
+
+function onStatusSelectChange(sel) {
+  const v = sel.value;
+  sel.className = `cl-status-select s-${v.toLowerCase()}`;
+  updateProgress(getCurrentChecklist());
+}
+
+function getCurrentChecklist() {
+  if (!currentLP) return [];
+  const rows = document.querySelectorAll(".cl-row");
+  return [...rows].map(row => {
+    const id = row.dataset.itemId;
+    const sel = row.querySelector(`select[data-item-id="${id}"]`);
+    const notes = row.querySelector(`textarea[data-item-id="${id}"]`);
+    const orig = currentLP.complianceChecklist?.find(i => i.id === id) || {};
+    return { ...orig, id, status: sel?.value || orig.status, gpNotes: notes?.value || "" };
+  });
+}
+
+function updateProgress(checklist) {
+  if (!Array.isArray(checklist) || !checklist.length) {
+    document.getElementById("cl-progress-fill").style.width = "0%";
+    document.getElementById("cl-progress-pct").textContent = "0%";
+    return;
+  }
+  const done = checklist.filter(i => i.status === "Verified" || i.status === "Received" || i.status === "Waived").length;
+  const pct  = Math.round(done / checklist.length * 100);
+  document.getElementById("cl-progress-fill").style.width = pct + "%";
+  document.getElementById("cl-progress-pct").textContent  = pct + "%";
+}
+
+function markAll(status) {
+  document.querySelectorAll(".cl-status-select").forEach(sel => {
+    sel.value = status;
+    sel.className = `cl-status-select s-${status.toLowerCase()}`;
+  });
+  updateProgress(getCurrentChecklist());
+}
+
+async function saveChecklist() {
+  if (!currentLP) return;
+  const updates = getCurrentChecklist().map(i => ({ id: i.id, status: i.status, gpNotes: i.gpNotes }));
+  const btn = document.getElementById("save-all-btn");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    const res = await fetch(`/api/lp/${currentLP.id}/checklist`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ updates })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    currentLP.complianceChecklist = data.checklist;
+    currentLP.status = data.lpStatus;
+    // Update row in table
+    const row = document.querySelector(`tr[data-id="${currentLP.id}"]`);
+    if (row) {
+      const statusCell = row.querySelector("td:nth-child(5)");
+      const checkCell  = row.querySelector("td:nth-child(7)");
+      if (statusCell) statusCell.innerHTML = statusPill(data.lpStatus);
+      if (checkCell)  checkCell.innerHTML  = progressBar(data.checklist);
     }
-  }).catch(() => {});
+    // Update drawer status select
+    document.getElementById("d-status-select").value = data.lpStatus;
+    toast("✓ Compliance checklist saved", "ok");
+  } catch(e) {
+    toast("Save failed: " + e.message, "err");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾 Save Compliance Changes";
+  }
+}
 
-  // Auto-refresh every 30s
-  loadDashboard();
-  setInterval(loadDashboard, 30000);
+async function saveStatus() {
+  if (!currentLP) return;
+  const status = document.getElementById("d-status-select").value;
+  try {
+    const res = await fetch(`/api/lp/${currentLP.id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    currentLP.status = status;
+    // Update table row
+    const row = document.querySelector(`tr[data-id="${currentLP.id}"]`);
+    if (row) {
+      const cell = row.querySelector("td:nth-child(5)");
+      if (cell) cell.innerHTML = statusPill(status);
+    }
+    toast("✓ Status updated to: " + status);
+  } catch(e) {
+    toast("Update failed: " + e.message, "err");
+  }
+}
+
+async function logout() {
+  await fetch("/auth/logout", { method: "POST" });
+  window.location.href = "/login";
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+fetch("/auth/me").then(r => {
+  if (r.status === 401) { window.location.href = "/login?redirect=/gp"; return null; }
+  return r.json();
+}).then(u => {
+  if (!u) return;
+  const el = document.getElementById("sidebar-user");
+  if (el) el.innerHTML = `<span style="font-weight:600">${esc(u.name)}</span><br>
+    <span style="font-size:0.72rem;color:#5E8FAD">${u.role.toUpperCase()}</span>`;
+}).catch(()=>{});
+
+// Init
+loadAll();
+setInterval(loadAll, 60000);
 </script>
 
 </body>
