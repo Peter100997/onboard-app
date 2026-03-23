@@ -402,10 +402,22 @@
 
       <div class="form-group">
         <label class="field-label">Upload Documents (Optional)</label>
-        <div style="border: 2px dashed var(--lgrey); border-radius: 8px; padding: 1.5rem;
-                    text-align: center; color: #94A3B8; font-size: 0.875rem;">
-          📎 Drag &amp; drop files here, or <span style="color:var(--teal);cursor:pointer">browse</span><br>
+        <input type="file" id="doc-file-input" multiple accept=".pdf,.jpg,.jpeg,.png"
+               style="display:none" onchange="handleFileSelect(this.files)">
+        <div id="drop-zone"
+             style="border: 2px dashed var(--lgrey); border-radius: 8px; padding: 1.5rem;
+                    text-align: center; color: #94A3B8; font-size: 0.875rem; cursor:pointer;
+                    transition: border-color .2s, background .2s;"
+             onclick="document.getElementById('doc-file-input').click()"
+             ondragover="event.preventDefault(); this.style.borderColor='var(--teal)'; this.style.background='#F0FDFA';"
+             ondragleave="this.style.borderColor='var(--lgrey)'; this.style.background='';"
+             ondrop="event.preventDefault(); this.style.borderColor='var(--lgrey)'; this.style.background=''; handleFileSelect(event.dataTransfer.files);">
+          📎 Drag &amp; drop files here, or <span style="color:var(--teal);font-weight:600">browse</span><br>
           <span style="font-size:0.75rem">PDF, JPG, PNG · Max 10MB per file</span>
+        </div>
+        <div id="file-list" style="margin-top:0.75rem; display:none;">
+          <div style="font-size:0.75rem; font-weight:600; color:var(--slate); margin-bottom:0.5rem;">Selected files:</div>
+          <div id="file-items" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
         </div>
         <span class="hint">Document upload is optional at this stage. Our team will reach out separately with secure upload instructions.</span>
       </div>
@@ -596,6 +608,45 @@ function renderDocuments() {
       <span class="checkbox-text"><strong>${d.label}</strong> — ${d.desc}</span>
     </label>
   `).join("");
+}
+
+// ── File Upload ───────────────────────────────────────────────────────────────
+let uploadedFiles = [];
+
+function handleFileSelect(fileList) {
+  const maxSize = 10 * 1024 * 1024; // 10 MB
+  const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+  const newFiles = Array.from(fileList).filter(f => {
+    if (!allowed.includes(f.type)) { alert(`"${f.name}" is not a supported file type (PDF, JPG, PNG only).`); return false; }
+    if (f.size > maxSize) { alert(`"${f.name}" exceeds the 10 MB limit.`); return false; }
+    if (uploadedFiles.find(x => x.name === f.name)) return false; // skip duplicates
+    return true;
+  });
+  uploadedFiles = uploadedFiles.concat(newFiles);
+  renderFileList();
+}
+
+function removeFile(name) {
+  uploadedFiles = uploadedFiles.filter(f => f.name !== name);
+  renderFileList();
+}
+
+function renderFileList() {
+  const wrap = document.getElementById('file-list');
+  const items = document.getElementById('file-items');
+  if (!uploadedFiles.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  items.innerHTML = uploadedFiles.map(f => {
+    const kb = (f.size / 1024).toFixed(0);
+    const icon = f.type === 'application/pdf' ? '📄' : '🖼️';
+    return `<div style="display:flex; align-items:center; justify-content:space-between;
+                        background:#F1F5F9; border-radius:6px; padding:0.4rem 0.75rem;
+                        font-size:0.8rem;">
+              <span>${icon} ${f.name} <span style="color:#94A3B8">(${kb} KB)</span></span>
+              <span onclick="removeFile('${f.name.replace(/'/g,"\\'")}');event.stopPropagation()"
+                    style="cursor:pointer; color:#EF4444; margin-left:0.75rem; font-weight:700;">✕</span>
+            </div>`;
+  }).join('');
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
